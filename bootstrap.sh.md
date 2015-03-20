@@ -3,6 +3,7 @@
 * gem install lilp
 *  lilp bootstrap.sh.md; bash bootstrap.sh
 * ./mdlp.awk bootstrap.sh.md > bootstrap.sh
+* ./mdlp.awk bootstrap.sh.md | bash -x
 ```
 #!/bin/sh
 mkdir -p ./.go/
