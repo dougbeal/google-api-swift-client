@@ -1005,13 +1005,14 @@ func (s *Schema) writeSchemaCode(indent string, api *API) {
 	}
 
 	if _, ok := s.Type().ArrayType(); ok {
+		s.api.pn("//TODO writeSchemaCode for arrays for %s", s.GoName())		
 		log.Printf("TODO writeSchemaCode for arrays for %s", s.GoName())
 		return
 	}
 
 	if destSchema, ok := s.Type().ReferenceSchema(); ok {
 		// Convert it to a struct using embedding.
-		s.api.p("\nstruct %s: JSONDecodable {\n", s.SwiftName())
+		s.api.p("\nstruct %s: JSONDecodable {\n // REFERENCE", s.SwiftName())
 		s.api.p("\t%s\n", destSchema.SwiftName())
 		s.api.p("}\n")
 		return
@@ -1893,7 +1894,7 @@ func simpleSwiftTypeConvert(apiType, format string) (swifttype string, ok bool) 
 	case "integer":
 		swifttype = "Int64"
 	case "any":
-		swifttype = "/* OOOOOH NOOOO */ interface{}"
+		swifttype = "AnyObject"
 	}
 	return swifttype, swifttype != ""
 }
