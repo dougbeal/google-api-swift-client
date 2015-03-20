@@ -26,6 +26,7 @@ import (
 
 // goGenVersion is the version of the Go code generator
 const goGenVersion = "0.5"
+const swiftIndent = "    "
 
 var (
 	apiToGenerate = flag.String("api", "*", "The API ID to generate, like 'tasks:v1'. A value of '*' means all.")
@@ -122,8 +123,10 @@ func main() {
 		if *build {
 			var args []string
 			if *install {
+				log.Printf("install API %s", api.ID)
 				args = append(args, "install")
 			} else {
+				log.Printf("build API %s", api.ID)
 				args = append(args, "build")
 			}
 			args = append(args, api.Target())
@@ -357,7 +360,7 @@ func (a *API) WriteGeneratedCode() error {
 
 	genfilename := *output
 	if genfilename == "" {
-		genfilename = filepath.Join(outdir, pkg+"-gen.go")
+		genfilename = filepath.Join(outdir, pkg+"-gen.swift")
 	}
 
 	code, err := a.GenerateCode()
@@ -371,6 +374,7 @@ func (a *API) WriteGeneratedCode() error {
 var docsLink string
 
 func (a *API) GenerateCode() ([]byte, error) {
+	var indent = swiftIndent + swiftIndent 
 	pkg := a.Package()
 
 	a.m = make(map[string]interface{})
@@ -414,80 +418,96 @@ func (a *API) GenerateCode() ([]byte, error) {
 	p("//   ...\n")
 	p("//   %sService, err := %s.New(oauthHttpClient)\n", pkg, pkg)
 
-	p("package %s\n", pkg)
+	pn("import Foundation")
+	pn("import Alamofire")
+	pn("import Argo")
+	pn("import Runes")			
 	p("\n")
-	p("import (\n")
-	for _, pkg := range []string{
-		"bytes",
-		*googleAPIPkg,
-		"encoding/json",
-		"errors",
-		"fmt",
-		"io",
-		"net/http",
-		"net/url",
-		"strconv",
-		"strings",
-		*contextPkg,
-	} {
-		p("\t%q\n", pkg)
-	}
-	p(")\n\n")
-	pn("// Always reference these packages, just in case the auto-generated code")
-	pn("// below doesn't.")
-	pn("var _ = bytes.NewBuffer")
-	pn("var _ = strconv.Itoa")
-	pn("var _ = fmt.Sprintf")
-	pn("var _ = json.NewDecoder")
-	pn("var _ = io.Copy")
-	pn("var _ = url.Parse")
-	pn("var _ = googleapi.Version")
-	pn("var _ = errors.New")
-	pn("var _ = strings.Replace")
-	pn("var _ = context.Background")
-	pn("")
-	pn("const apiId = %q", jstr(m, "id"))
-	pn("const apiName = %q", jstr(m, "name"))
-	pn("const apiVersion = %q", jstr(m, "version"))
-	p("const basePath = %q\n", a.apiBaseURL())
+	
+	//p("package %s\n", pkg)
+	p("public class %s {\n", pkg)
+
+	// p("import (\n")
+	// for _, pkg := range []string{
+	// 	"bytes",
+	// 	*googleAPIPkg,
+	// 	"encoding/json",
+	// 	"errors",
+	// 	"fmt",
+	// 	"io",
+	// 	"net/http",
+	// 	"net/url",
+	// 	"strconv",
+	// 	"strings",
+	// 	*contextPkg,
+	// } {
+	// 	p("\t%q\n", pkg)
+	// }
+	// p(")\n\n")
+	// pn("// Always reference these packages, just in case the auto-generated code")
+	// pn("// below doesn't.")
+	// pn("var _ = bytes.NewBuffer")
+	// pn("var _ = strconv.Itoa")
+	// pn("var _ = fmt.Sprintf")
+	// pn("var _ = json.NewDecoder")
+	// pn("var _ = io.Copy")
+	// pn("var _ = url.Parse")
+	// pn("var _ = googleapi.Version")
+	// pn("var _ = errors.New")
+	// pn("var _ = strings.Replace")
+	// pn("var _ = context.Background")
+	// pn("")
+	pn(swiftIndent + "let apiId = %q", jstr(m, "id"))
+	pn(swiftIndent + "let apiName = %q", jstr(m, "name"))
+	pn(swiftIndent + "let apiVersion = %q", jstr(m, "version"))
+	pn(swiftIndent + "let basePath = %q", a.apiBaseURL())
+	pn(swiftIndent + "let baseURL = NSURL(string: basePath)!")
 	p("\n")
-
-	a.generateScopeConstants()
-
-	a.GetName("New") // ignore return value; we're the first caller
-	pn("func New(client *http.Client) (*Service, error) {")
-	pn("if client == nil { return nil, errors.New(\"client is nil\") }")
-	pn("s := &Service{client: client, BasePath: basePath}")
+	p("// MARK: scope constants\n")	
+	a.generateScopeConstants(swiftIndent)
+	p("\n")
+	a.GetName("New") // ignore return value; we're the first caller	
+	pn(swiftIndent + "class func New(client: Alamofire.Manager) -> Service? {")
+	pn(indent + "if client == nil { return nil }")
+	pn(indent + "BasePath = %s.basePath", pkg)
+	/* trying out lazy
 	for _, res := range reslist { // add top level resources.
-		pn("s.%s = New%s(s)", res.GoField(), res.GoType())
+		pn(indent + "%s = %s(s)", res.GoField(), res.SwiftType())
 	}
-	pn("return s, nil")
-	pn("}")
+*/
+	//pn(indent + "return s, nil")
+	pn(swiftIndent + "}")		
+	p("}\n")	
 
+	
+	p("//service\n")
 	a.GetName("Service") // ignore return value; no user-defined names yet
-	p("\ntype Service struct {\n")
-	p("\tclient *http.Client\n")
-	p("\tBasePath string // API endpoint base URL\n")
+	p("\nstruct Service {\n")
+	p(swiftIndent + "let client: Alamofire.Manager\n")
+	p(swiftIndent + "let BasePath: String // API endpoint base URL\n")
 
 	for _, res := range reslist {
-		p("\n\t%s\t*%s\n", res.GoField(), res.GoType())
+		p("%slazy var %s: %s = %s(s: self)\n", swiftIndent, res.GoField(), res.SwiftType(), res.SwiftType())
 	}
+	pn("")
+
 	p("}\n")
 
+	p("// MARK: res generatetype\n")
 	for _, res := range reslist {
 		res.generateType()
 	}
 
 	a.PopulateSchemas()
-
+	p("// MARK: schema code\n")
 	for _, name := range a.sortedSchemaNames() {
-		a.schemas[name].writeSchemaCode(a)
+		a.schemas[name].writeSchemaCode(swiftIndent, a)
 	}
-
+	p("// MARK: meth code\n")
 	for _, meth := range a.APIMethods() {
 		meth.generateCode()
 	}
-
+	p("// MARK: res methods\n")
 	for _, res := range reslist {
 		res.generateMethods()
 	}
@@ -499,7 +519,7 @@ func (a *API) GenerateCode() ([]byte, error) {
 	return clean, nil
 }
 
-func (a *API) generateScopeConstants() {
+func (a *API) generateScopeConstants(indent string) {
 	auth := jobj(a.m, "auth")
 	if auth == nil {
 		return
@@ -513,22 +533,22 @@ func (a *API) generateScopeConstants() {
 		return
 	}
 
-	a.p("// OAuth2 scopes used by this API.\n")
-	a.p("const (\n")
+	a.p(indent + "// OAuth2 scopes used by this API.\n")
+	a.p(indent + "struct scope {\n")
 	n := 0
 	for _, scopeName := range sortedKeys(scopes) {
 		mi := scopes[scopeName]
 		if n > 0 {
-			a.p("\n")
+			a.p( "\n")
 		}
 		n++
 		ident := scopeIdentifierFromURL(scopeName)
 		if des := jstr(mi.(map[string]interface{}), "description"); des != "" {
-			a.p("%s", asComment("\t", des))
+			a.p("%s", asComment(indent + swiftIndent, des))
 		}
-		a.p("\t%s = %q\n", ident, scopeName)
+		a.p(indent + swiftIndent + "let %s = %q\n", ident, scopeName)
 	}
-	a.p(")\n\n")
+	a.p(indent + "}\n\n")
 }
 
 func scopeIdentifierFromURL(urlStr string) string {
@@ -611,6 +631,10 @@ func (t *Type) asSimpleGoType() (goType string, ok bool) {
 	return simpleTypeConvert(t.apiType(), t.apiTypeFormat())
 }
 
+func (t *Type) asSimpleSwiftType() (goType string, ok bool) {
+	return simpleSwiftTypeConvert(t.apiType(), t.apiTypeFormat())
+}
+
 func (t *Type) String() string {
 	return fmt.Sprintf("[type=%q, map=%s]", t.apiType(), prettyJSON(t.m))
 }
@@ -664,6 +688,59 @@ func (t *Type) AsGo() string {
 		panic("in Type.AsGo, no _apiName found for struct type " + prettyJSON(t.m))
 	}
 	panic("unhandled Type.AsGo for " + prettyJSON(t.m))
+}
+
+func (t *Type) AsSwift() string {
+	if t, ok := t.asSimpleSwiftType(); ok {
+		
+		return t
+	}
+	if at, ok := t.ArrayType(); ok {
+		if at.apiType() == "string" {
+			switch at.apiTypeFormat() {
+			case "int64":
+				return "googleapi.Int64s"
+			case "uint64":
+				return "googleapi.Uint64s"
+			case "int32":
+				return "googleapi.Int32s"
+			case "uint32":
+				return "googleapi.Uint32s"
+			case "float64":
+				return "googleapi.Float64s"
+			default:
+				return "[" + at.AsSwift() + "]"
+			}
+		}
+		return "[" + at.AsSwift() + "]"
+	}
+	if ref, ok := t.Reference(); ok {
+		s := t.api.schemas[ref]
+		if s == nil {
+			panic(fmt.Sprintf("in Type.AsSwift(), failed to find referenced type %q for %s",
+				ref, prettyJSON(t.m)))
+		}
+		return s.Type().AsSwift()
+	}
+	if typ, ok := t.MapType(); ok {
+		return typ
+	}
+	if t.IsStruct() {
+		if apiName, ok := t.m["_apiName"].(string); ok {
+			s := t.api.schemas[apiName]
+			if s == nil {
+				panic(fmt.Sprintf("in Type.AsSwift, _apiName of %q didn't point to a valid schema; json: %s",
+					apiName, prettyJSON(t.m)))
+			}
+			if v := jobj(s.m, "variant"); v != nil {
+				return s.SwiftName()
+			}
+			// optional?
+			return s.SwiftName() + "?"
+		}
+		panic("in Type.AsSwift, no _apiName found for struct type " + prettyJSON(t.m))
+	}
+	panic("unhandled Type.AsSwift for " + prettyJSON(t.m))
 }
 
 func (t *Type) IsSimple() bool {
@@ -883,6 +960,17 @@ func (s *Schema) GoName() string {
 	return s.goName
 }
 
+func (s *Schema) SwiftName() string {
+	if s.goName == "" {
+		if name, ok := s.Type().MapType(); ok {
+			s.goName = name
+		} else {
+			s.goName = s.api.GetName(initialCap(s.apiName))
+		}
+	}
+	return s.goName
+}
+
 // GoReturnType returns the Go type to use as the return type.
 // If a type is a struct, it will return *StructType,
 // for a map it will return map[string]ValueType,
@@ -898,9 +986,21 @@ func (s *Schema) GoReturnType() string {
 	return s.goReturnType
 }
 
-func (s *Schema) writeSchemaCode(api *API) {
+func (s *Schema) SwiftReturnType() string {
+	if s.goReturnType == "" {
+		if s.Type().IsMap() {
+			s.goReturnType = s.SwiftName()
+		} else {
+			s.goReturnType = s.SwiftName()
+		}
+	}
+	return s.goReturnType
+}
+
+func (s *Schema) writeSchemaCode(indent string, api *API) {
+	s.api.pn("// writeSchemaCode")
 	if s.Type().IsStruct() && !s.Type().IsMap() {
-		s.writeSchemaStruct(api)
+		s.writeSchemaStruct(indent, api)
 		return
 	}
 
@@ -911,8 +1011,8 @@ func (s *Schema) writeSchemaCode(api *API) {
 
 	if destSchema, ok := s.Type().ReferenceSchema(); ok {
 		// Convert it to a struct using embedding.
-		s.api.p("\ntype %s struct {\n", s.GoName())
-		s.api.p("\t%s\n", destSchema.GoName())
+		s.api.p("\nstruct %s: JSONDecodable {\n", s.SwiftName())
+		s.api.p("\t%s\n", destSchema.SwiftName())
 		s.api.p("}\n")
 		return
 	}
@@ -920,7 +1020,7 @@ func (s *Schema) writeSchemaCode(api *API) {
 	if s.Type().IsSimple() {
 		apitype := jstr(s.m, "type")
 		typ := mustSimpleTypeConvert(apitype, jstr(s.m, "format"))
-		s.api.p("\ntype %s %s\n", s.GoName(), typ)
+		s.api.p("\ntype %s %s\n", s.SwiftName(), typ)
 		return
 	}
 
@@ -932,6 +1032,7 @@ func (s *Schema) writeSchemaCode(api *API) {
 	panicf("writeSchemaCode: unsupported type for schema %q", s.apiName)
 }
 
+// TODO: not converted to swift
 func (s *Schema) writeVariant(api *API, v map[string]interface{}) {
 	s.api.p("\ntype %s map[string]interface{}\n\n", s.GoName())
 
@@ -965,27 +1066,70 @@ func (s *Schema) writeVariant(api *API, v map[string]interface{}) {
 	}
 }
 
-func (s *Schema) writeSchemaStruct(api *API) {
+func (s *Schema) writeSchemaStruct(indent string, api *API) {
+	s.api.pn("\n// writeSchemaStruct")
 	if v := jobj(s.m, "variant"); v != nil {
 		s.writeVariant(api, v)
 		return
 	}
 	// TODO: description
-	s.api.p("\ntype %s struct {\n", s.GoName())
+	s.api.p("\nstruct %s: JSONDecodable {\n", s.GoName())
 	for i, p := range s.properties() {
 		if i > 0 {
 			s.api.p("\n")
 		}
 		pname := p.GoName()
 		if des := p.Description(); des != "" {
-			s.api.p("%s", asComment("\t", fmt.Sprintf("%s: %s", pname, des)))
+			s.api.p("%s", asComment(indent, fmt.Sprintf("%s: %s", pname, des)))
 		}
 		var extraOpt string
 		if p.Type().isIntAsString() {
 			extraOpt += ",string"
 		}
-		s.api.p("\t%s %s `json:\"%s,omitempty%s\"`\n", pname, p.Type().AsGo(), p.APIName(), extraOpt)
+		s.api.p(indent + "let %s: %s //  json:\"%s,omitempty%s\" \n", pname, p.Type().AsSwift(),
+			p.APIName(), extraOpt)
+
 	}
+
+	// create function
+	s.api.p("\n" + indent + "static func create (")
+	for i, p := range s.properties() {
+		if i > 0 {
+			s.api.p(", ")
+		}
+		pname := p.GoName()
+		ptype := p.Type().AsSwift()
+		s.api.p("%s: %s", pname, ptype)
+
+	}
+	s.api.p(") -> %s {\n", s.GoName())
+	s.api.p(indent + swiftIndent + "return %s(", s.GoName())
+	for i, p := range s.properties() {
+		if i > 0 {
+			s.api.p(", ")
+		}
+		pname := p.GoName()
+		s.api.p("%s: %s", pname, pname)
+		
+	}
+	s.api.p(")\n")
+	s.api.pn(indent + "}")
+
+	// decode function
+	s.api.p("\n" + indent + "static func decode (j: JSON) -> Decoded<%s> {\n", s.GoName())
+	s.api.pn(indent + swiftIndent + "return %s.create",  s.GoName())
+	for i, p := range s.properties() {
+		if i > 0 {
+			s.api.p(indent + swiftIndent + swiftIndent + "<^> ")
+		} else {
+			s.api.p(indent + swiftIndent + swiftIndent + "<*> ")			
+		}
+		
+		pname := p.GoName()
+		s.api.p("j <|? %s\n", pname)
+
+	}
+	s.api.pn(indent + "}")
 	s.api.p("}\n")
 }
 
@@ -1032,24 +1176,29 @@ type Resource struct {
 	resources []*Resource
 }
 
+
 func (r *Resource) generateType() {
 	p, pn := r.api.p, r.api.pn
-	t := r.GoType()
-	pn(fmt.Sprintf("func New%s(s *Service) *%s {", t, t))
-	pn("rs := &%s{s : s}", t)
+	t := r.SwiftType()
+	var indent = swiftIndent
+	pn(fmt.Sprintf("struct %s {", t))
+	pn(indent + "let s: Service")
+	pn(indent + "let rs: %s", t)		
+	//pn(indent + "rs := &%s{s : s}", t)
+	//TODO: what uses this?
 	for _, res := range r.resources {
-		pn("rs.%s = New%s(s)", res.GoField(), res.GoType())
+		pn("// rs.%s = New%s(s)", res.GoField(), res.SwiftType())
 	}
-	pn("return rs")
 	pn("}")
-
-	p("\ntype %s struct {\n", t)
+	p("")
+	/*
+	p("\nstruct %s {\n", t)
 	p("\ts *Service\n")
 	for _, res := range r.resources {
-		p("\n\t%s\t*%s\n", res.GoField(), res.GoType())
+		p("\n\t%s\t*%s\n", res.GoField(), res.SwiftType())
 	}
 	p("}\n")
-
+*/
 	for _, res := range r.resources {
 		res.generateType()
 	}
@@ -1069,6 +1218,10 @@ func (r *Resource) GoField() string {
 }
 
 func (r *Resource) GoType() string {
+	return initialCap(fmt.Sprintf("%s.%s", r.parent, r.name)) + "Service"
+}
+
+func (r *Resource) SwiftType() string {
 	return initialCap(fmt.Sprintf("%s.%s", r.parent, r.name)) + "Service"
 }
 
@@ -1167,11 +1320,13 @@ func (m *Method) RequiredQueryParams() []*Param {
 }
 
 func (meth *Method) generateCode() {
+	
 	res := meth.r // may be nil if a top-level method
 	a := meth.api
 	p, pn := a.p, a.pn
 
 	pn("\n// method id %q:", meth.Id())
+	pn("// meth generateCode")
 
 	retTypeComma := responseType(a, meth.m)
 	if retTypeComma != "" {
@@ -1179,19 +1334,19 @@ func (meth *Method) generateCode() {
 	}
 
 	args := meth.NewArguments()
-	methodName := initialCap(meth.name)
+	methodName := meth.name
 	prefix := ""
 	if res != nil {
 		prefix = initialCap(fmt.Sprintf("%s.%s", res.parent, res.name))
 	}
-	callName := a.GetName(prefix + methodName + "Call")
-
-	p("\ntype %s struct {\n", callName)
-	p("\ts *Service\n")
+	callName := a.GetName(prefix + initialCap(methodName) + "Call")
+	// Call structure
+	p("\nstruct %s {\n", callName)
+	p(swiftIndent + "let s: Service\n")
 	for _, arg := range args.l {
-		p("\t%s %s\n", arg.goname, arg.gotype)
+		p(swiftIndent + "var %s: %s\n", arg.goname, arg.gotype)
 	}
-	p("\topt_ map[string]interface{}\n")
+	p(swiftIndent + "var opt_: [String: String]\n")
 	if meth.supportsMediaUpload() {
 		p("\tmedia_     io.Reader\n")
 		p("\tresumable_ googleapi.SizeReaderAt\n")
@@ -1209,34 +1364,42 @@ func (meth *Method) generateCode() {
 	}
 
 	var servicePtr string
+	pn("// // ...Service extension")
 	if res == nil {
-		p("func (s *Service) %s(%s) *%s {\n", methodName, args, callName)
-		servicePtr = "s"
+		p("public extension %s {\n", "Service") 
+		p(swiftIndent + "func %s(%s) -> %s {\n", methodName, args, callName)
+		servicePtr = "s"				
+
 	} else {
-		p("func (r *%s) %s(%s) *%s {\n", res.GoType(), methodName, args, callName)
-		servicePtr = "r.s"
+		p("public extension %s {\n", res.SwiftType())
+		p(swiftIndent + "func %s(%s) -> %s {\n", methodName, args, callName)
+		servicePtr = "s"
 	}
-
-	p("\tc := &%s{s: %s, opt_: make(map[string]interface{})}\n", callName, servicePtr)
+	var indent = swiftIndent + swiftIndent 
+	p(indent + "c = %s(s: %s, opt_: Dictionary<String, String>())\n", callName, servicePtr)
 	for _, arg := range args.l {
-		p("\tc.%s = %s\n", arg.goname, arg.goname)
+		p(indent + "c.%s = %s\n", arg.goname, arg.goname)
 	}
-	p("\treturn c\n")
-	p("}\n")
+	p(indent + "return c\n")
+	p(swiftIndent + "}\n")
+	
+	pn("// // ...Call extension")
+	pn("public extension %s {", callName)
 
+	servicePtr = "s"	
 	for _, opt := range meth.OptParams() {
-		setter := initialCap(opt.name)
+		setter := opt.name
 		des := jstr(opt.m, "description")
 		des = strings.Replace(des, "Optional.", "", 1)
 		des = strings.TrimSpace(des)
-		p("\n%s", asComment("", fmt.Sprintf("%s sets the optional parameter %q: %s", setter, opt.name, des)))
+		p("\n%s", asComment(swiftIndent, fmt.Sprintf("%s sets the optional parameter %q: %s", setter, opt.name, des)))
 		np := new(namePool)
 		np.Get("c") // take the receiver's name
 		paramName := np.Get(validGoIdentifer(opt.name))
-		p("func (c *%s) %s(%s %s) *%s {\n", callName, setter, paramName, opt.GoType(), callName)
-		p("c.opt_[%q] = %s\n", opt.name, paramName)
-		p("return c\n")
-		p("}\n")
+		p(swiftIndent + "func %s(%s: %s) -> %s {\n", setter, paramName, opt.SwiftType(), callName)
+		p(indent + "c.opt_[%q] = %s\n", opt.name, paramName)
+		p(indent + "return c\n")
+		p(swiftIndent + "}\n")
 	}
 
 	if meth.supportsMediaUpload() {
@@ -1267,140 +1430,172 @@ func (meth *Method) generateCode() {
 		pn("}")
 	}
 
-	pn("\n// Fields allows partial responses to be retrieved.")
-	pn("// See https://developers.google.com/gdata/docs/2.0/basics#PartialResponse")
-	pn("// for more information.")
-	pn("func (c *%s) Fields(s ...googleapi.Field) *%s {", callName, callName)
-	pn(`c.opt_["fields"] = googleapi.CombineFields(s)`)
-	pn("return c")
-	pn("}")
+	pn("\n" + swiftIndent + "// Fields allows partial responses to be retrieved.")
+	pn(swiftIndent + "// See https://developers.google.com/gdata/docs/2.0/basics#PartialResponse")
+	pn(swiftIndent + "// for more information.")
+	pn(swiftIndent + "func fields(s: googleapi.Field...) -> %s {", callName)
+	// TODO: convert googleapi.CompileFields?
+	pn(indent + `c.opt_["fields"] = googleapi.CombineFields(s)`)
+	pn(indent + "return c")
+	pn(swiftIndent + "}")
 
-	pn("\nfunc (c *%s) Do() (%serror) {", callName, retTypeComma)
+	pn("\n" + swiftIndent + "func do(block: (%serror) -> () ) {", retTypeComma)
 
 	nilRet := ""
 	if retTypeComma != "" {
 		nilRet = "nil, "
 	}
-	pn("var body io.Reader = nil")
+/*
+let json: AnyObject? = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions(0), error: .None)
+
+if let j: AnyObject = json {
+  let value = JSONValue.parse(j)
+  let user = User.decode(value)
+}
+*/
+	pn(indent + `let basePath = c.s.BasePath`)
+	pn(indent + `let path = "%s"`, jstr(meth.m, "path"))
+	pn(indent + `let baseURL = NSURL(string: basePath)!`)
+	pn(indent + `let url = NSURLComponents(URL: basePath, resolvedAgainstBaseURL: true)`)
+	pn(indent + "var manager = Alamofire.Manager.sharedInstance")
+	pn(indent + "var headers = manager.session.configuration.HTTPAdditionalHeaders ?? Dictionary<String, String>()")
+	
+	//pn(indent + "var body io.Reader = nil")
 	hasContentType := false
 	httpMethod := jstr(meth.m, "httpMethod")
 	if ba := args.bodyArg(); ba != nil && httpMethod != "GET" {
+		/*
 		style := "WithoutDataWrapper"
 		if a.needsDataWrapper() {
 			style = "WithDataWrapper"
 		}
-		pn("body, err := googleapi.%s.JSONReader(c.%s)", style, ba.goname)
-		pn("if err != nil { return %serr }", nilRet)
-		pn(`ctype := "application/json"`)
+*/
+		pn(indent + "// TODO: convert body to JSON")
+		/*
+		pn(indent + "body, err := googleapi.%s.JSONReader(c.%s)", style, ba.goname)
+		pn(indent + "if err != nil { return %serr }", nilRet)*/
+		pn(indent + `let ctype = "application/json"`)
+
 		hasContentType = true
 	}
-	pn("params := make(url.Values)")
+	pn(indent + "var params = Dictionary<String, String>()")
 	// Set this first. if they override it, though, might be gross.  We don't expect
 	// XML replies elsewhere.  TODO(bradfitz): hide this option in the generated code?
-	pn(`params.Set("alt", "json")`)
+	pn(indent + `params["alt"] = ["json"]`)
 	for _, p := range meth.RequiredQueryParams() {
-		pn("params.Set(%q, fmt.Sprintf(\"%%v\", c.%s))", p.name, p.goCallFieldName())
+		pn(indent + `params[%q] = "\(c.%s)"`, p.name, p.goCallFieldName())
 	}
+	// TODO: where is this used?
 	for _, p := range meth.RequiredRepeatedQueryParams() {
-		pn("for _, v := range c.%s { params.Add(%q, fmt.Sprintf(\"%%v\", v)) }",
+		pn(indent + `for _, v in c.%s { params[%q] = "\(v)" }`,
 			p.name, p.name)
 	}
 	opts := meth.OptParams()
 	opts = append(opts, &Param{name: "fields"})
 	for _, p := range opts {
-		pn("if v, ok := c.opt_[%q]; ok { params.Set(%q, fmt.Sprintf(\"%%v\", v)) }",
+		// TODO: fix this if support xcode 6.2
+		pn(indent + `if v = c.opt_[%q] { params[%q] = "\(v)" }`,
 			p.name, p.name)
 	}
 
-	p("urls := googleapi.ResolveRelative(c.s.BasePath, %q)\n", jstr(meth.m, "path"))
+	//p(indent + "urls := googleapi.ResolveRelative(c.s.BasePath, %q)\n", jstr(meth.m, "path"))
+	// TODO: convert to swift
 	if meth.supportsMediaUpload() {
-		pn("var progressUpdater_ googleapi.ProgressUpdater")
-		pn("if v, ok := c.opt_[\"progressUpdater\"]; ok {")
-		pn(" if pu, ok := v.(googleapi.ProgressUpdater); ok {")
-		pn("  progressUpdater_ = pu")
-		pn(" }")
-		pn("}")
-		pn("if c.media_ != nil || c.resumable_ != nil {")
+		pn( indent + "// TODO: Swift Media upload goes here" )
+		/*
+		pn( indent + "var progressUpdater_ googleapi.ProgressUpdater")
+		pn( indent + "if v, ok := c.opt_[\"progressUpdater\"]; ok {")
+		pn( indent + " if pu, ok := v.(googleapi.ProgressUpdater); ok {")
+		pn( indent + "  progressUpdater_ = pu")
+		pn( indent + " }")
+		pn( indent + "}")
+		pn( indent + "if c.media_ != nil || c.resumable_ != nil {")
 		// Hack guess, since we get a 404 otherwise:
 		//pn("urls = googleapi.ResolveRelative(%q, %q)", a.apiBaseURL(), meth.mediaUploadPath())
 		// Further hack.  Discovery doc is wrong?
-		pn("urls = strings.Replace(urls, %q, %q, 1)", "https://www.googleapis.com/", "https://www.googleapis.com/upload/")
-		pn(`params.Set("uploadType", c.protocol_)`)
-		pn("}")
+		pn( indent + "urls = strings.Replace(urls, %q, %q, 1)", "https://www.googleapis.com/", "https://www.googleapis.com/upload/")
+		pn(indent + `params.Set("uploadType", c.protocol_)`)
+		pn( indent + "}")
+*/
 	}
-	pn("urls += \"?\" + params.Encode()")
 	if meth.supportsMediaUpload() && httpMethod != "GET" {
+		pn( indent + "// TODO: Swift Media upload goes here" )
+		/*
 		if !hasContentType { // Support mediaUpload but no ctype set.
-			pn("body = new(bytes.Buffer)")
+			pn( indent + "body = new(bytes.Buffer)")
 			pn(`ctype := "application/json"`)
 			hasContentType = true
 		}
-		pn(`if c.protocol_ != "resumable" {`)
-		pn(`  var cancel func()`)
-		pn("  cancel, _ = googleapi.ConditionallyIncludeMedia(c.media_, &body, &ctype)")
-		pn("  if cancel != nil { defer cancel() }")
-		pn("}")
+		pn(indent + `if c.protocol_ != "resumable" {`)
+		pn(indent + `  var cancel func()`)
+		pn( indent + "  cancel, _ = googleapi.ConditionallyIncludeMedia(c.media_, &body, &ctype)")
+		pn( indent + "  if cancel != nil { defer cancel() }")
+		pn( indent + "}")
+*/
 	}
-	pn("req, _ := http.NewRequest(%q, urls, body)", httpMethod)
+
+
+	/*
+        // TODO: need to be converted?
 	// Replace param values after NewRequest to avoid reencoding them.
 	// E.g. Cloud Storage API requires '%2F' in entity param to be kept, but url.Parse replaces it with '/'.
 	argsForLocation := args.forLocation("path")
 	if len(argsForLocation) > 0 {
-		pn(`googleapi.Expand(req.URL, map[string]string{`)
+		pn(indent + `googleapi.Expand(req.URL, map[string]string{`)
 		for _, arg := range argsForLocation {
-			pn(`"%s": %s,`, arg.apiname, arg.exprAsString("c."))
+			pn(indent + `"%s": %s,`, arg.apiname, arg.exprAsString("c."))
 		}
 		pn(`})`)
 	} else {
 		// Just call SetOpaque since we aren't calling Expand
-		pn(`googleapi.SetOpaque(req.URL)`)
+		pn(indent + `googleapi.SetOpaque(req.URL)`)
 	}
+*/
 
 	if meth.supportsMediaUpload() {
-		pn(`if c.protocol_ == "resumable" {`)
-		pn(" req.ContentLength = 0")
-		pn(` if c.mediaType_ == "" {`)
-		pn("  c.mediaType_ = googleapi.DetectMediaType(c.resumable_)")
-		pn(" }")
-		pn(` req.Header.Set("X-Upload-Content-Type", c.mediaType_)`)
-		pn(" req.Body = nil")
-		pn("} else {")
-		pn(` req.Header.Set("Content-Type", ctype)`)
-		pn("}")
+		// TODO: convert to swift
+		pn(indent + `if c.protocol_ == "resumable" {`)
+		pn(indent + " req.ContentLength = 0")
+		pn(indent + ` if c.mediaType_ == "" {`)
+		pn(indent + "  c.mediaType_ = googleapi.DetectMediaType(c.resumable_)")
+		pn(indent + " }")
+		pn(indent + ` req.Header.Set(indent + "X-Upload-Content-Type", c.mediaType_)`)
+		pn(indent + " req.Body = nil")
+		pn(indent + "} else {")
+		pn(indent + ` req.Header.Set(indent + "Content-Type", ctype)`)
+		pn(indent + "}")
 	} else if hasContentType {
-		pn(`req.Header.Set("Content-Type", ctype)`)
+		pn(indent + `headers["Content-Type"] = ctype`)		
 	}
-	pn(`req.Header.Set("User-Agent", "google-api-go-client/` + goGenVersion + `")`)
-	pn("res, err := c.s.client.Do(req);")
-	pn("if err != nil { return %serr }", nilRet)
-	pn("defer googleapi.CloseBody(res)")
-	pn("if err := googleapi.CheckResponse(res); err != nil { return %serr }", nilRet)
+
+	pn(indent + `headers["User-Agent"] = "google-api-swift-client/` + goGenVersion + `"`)
+	//pn(indent + "manager.session.configuration.HTTPAdditionalHeaders = headers")
+	pn(indent + "var req = manager.request(.%s, url, body, parameters: params)", httpMethod)	
+	pn(indent + "c.s.client.do(req) { (request, response, json, error) in")
+	pn(indent + swiftIndent + "block(%s.decode(json), error)", responseType(a, meth.m))
+	pn(indent + "}")
+	//pn(indent + "if err != nil { return %serr }", nilRet)
+	//pn(indent + "defer googleapi.CloseBody(res)")
+	//pn(indent + "if err := googleapi.CheckResponse(res); err != nil { return %serr }", nilRet)
 	if meth.supportsMediaUpload() {
-		pn(`if c.protocol_ == "resumable" {`)
-		pn(` loc := res.Header.Get("Location")`)
-		pn(" rx := &googleapi.ResumableUpload{")
-		pn("  Client:        c.s.client,")
-		pn("  URI:           loc,")
-		pn("  Media:         c.resumable_,")
-		pn("  MediaType:     c.mediaType_,")
-		pn("  ContentLength: c.resumable_.Size(),")
-		pn("  Callback:      progressUpdater_,")
-		pn(" }")
-		pn(" res, err = rx.Upload(c.ctx_)")
-		pn(" if err != nil { return %serr }", nilRet)
-		pn(" defer res.Body.Close()")
-		pn("}")
-	}
-	if retTypeComma == "" {
-		pn("return nil")
-	} else {
-		pn("var ret %s", responseType(a, meth.m))
-		pn("if err := json.NewDecoder(res.Body).Decode(&ret); err != nil { return nil, err }")
-		pn("return ret, nil")
+		pn(indent + `if c.protocol_ == "resumable" {`)
+		pn(indent + ` loc := res.Header.Get("Location")`)
+		pn(indent + " rx := &googleapi.ResumableUpload{")
+		pn(indent + "  Client:        c.s.client,")
+		pn(indent + "  URI:           loc,")
+		pn(indent + "  Media:         c.resumable_,")
+		pn(indent + "  MediaType:     c.mediaType_,")
+		pn(indent + "  ContentLength: c.resumable_.Size(),")
+		pn(indent + "  Callback:      progressUpdater_,")
+		pn(indent + " }")
+		pn(indent + " res, err = rx.Upload(c.ctx_)")
+		pn(indent + " if err != nil { return %serr }", nilRet)
+		pn(indent + " defer res.Body.Close()")
+		pn(indent + "}")
 	}
 
 	bs, _ := json.MarshalIndent(meth.m, "\t// ", "  ")
-	pn("// %s\n", string(bs))
+	pn(indent + "// %s\n", string(bs))
 	pn("}")
 }
 
@@ -1431,6 +1626,18 @@ func (p *Param) GoType() string {
 		panic("unexpected int parameter encoded as string, not in query: " + p.name)
 	}
 	t, ok := simpleTypeConvert(typ, format)
+	if !ok {
+		panic("failed to convert parameter type " + fmt.Sprintf("type=%q, format=%q", typ, format))
+	}
+	return t
+}
+
+func (p *Param) SwiftType() string {
+	typ, format := jstr(p.m, "type"), jstr(p.m, "format")
+	if typ == "string" && strings.Contains(format, "int") && p.Location() != "query" {
+		panic("unexpected int parameter encoded as string, not in query: " + p.name)
+	}
+	t, ok := simpleSwiftTypeConvert(typ, format)
 	if !ok {
 		panic("failed to convert parameter type " + fmt.Sprintf("type=%q, format=%q", typ, format))
 	}
@@ -1664,6 +1871,33 @@ func simpleTypeConvert(apiType, format string) (gotype string, ok bool) {
 	return gotype, gotype != ""
 }
 
+func simpleSwiftTypeConvert(apiType, format string) (swifttype string, ok bool) {
+	// From http://tools.ietf.org/html/draft-zyp-json-schema-03#section-5.1
+	switch apiType {
+	case "boolean":
+		swifttype = "Bool"
+	case "string":
+		swifttype = "String"
+		switch format {
+		case "int64":
+			swifttype = "Int64"
+		case "uint64":
+			swifttype = "UInt64"
+		case "int32":
+			swifttype = "Int32"			
+		case "uint32":
+			swifttype = "UInt32"
+		}
+	case "number":
+		swifttype = "Double"
+	case "integer":
+		swifttype = "Int64"
+	case "any":
+		swifttype = "/* OOOOOH NOOOO */ interface{}"
+	}
+	return swifttype, swifttype != ""
+}
+
 func mustSimpleTypeConvert(apiType, format string) string {
 	if gotype, ok := simpleTypeConvert(apiType, format); ok {
 		return gotype
@@ -1698,9 +1932,9 @@ func responseType(api *API, m map[string]interface{}) string {
 	if ro != nil {
 		if ref := jstr(ro, "$ref"); ref != "" {
 			if s := api.schemas[ref]; s != nil {
-				return s.GoReturnType()
+				return s.SwiftReturnType()
 			}
-			return "*" + ref
+			return "call: " + ref
 		}
 	}
 	return ""
