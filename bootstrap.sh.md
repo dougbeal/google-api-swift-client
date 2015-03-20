@@ -7,5 +7,6 @@ mkdir -p ./.go/
 GO_ENV="$(pwd)/.go"
 GOPATH="$GO_ENV" go get golang.org/x/net/context
 GOPATH="$GO_ENV" make
+echo (compile "cd .. && GOPATH=$GO_ENV/.go make -k youtube" nil)
 ```
-* (compile "cd .. && GOPATH=/Users/dougbeal/git/google-api-go-client/.go make -k youtube" nil)
+* 
