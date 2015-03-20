@@ -34,3 +34,5 @@ google-api-go-generator/google-api-go-gen
 *.8
 *~
 *.out
+
+build/
