@@ -10,7 +10,6 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"go/format"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -98,7 +97,7 @@ func (e *compileError) Error() string {
 
 func main() {
 	flag.Parse()
-
+	fmt.Printf("output %s\n", *output)
 	if *install {
 		*build = true
 	}
@@ -356,13 +355,16 @@ func (a *API) WriteGeneratedCode() error {
 	}
 
 	pkg := a.Package()
-	writeFile(filepath.Join(outdir, a.Package()+"-api.json"), a.jsonBytes())
+	name := filepath.Join(outdir, a.Package()+"-api.json")
+	fmt.Printf("json %s\n", name)
+	writeFile(name, a.jsonBytes())
 
 	genfilename := *output
 	if genfilename == "" {
 		genfilename = filepath.Join(outdir, pkg+"-gen.swift")
 	}
 
+	fmt.Printf("code %s\n", genfilename)
 	code, err := a.GenerateCode()
 	errw := writeFile(genfilename, code)
 	if err == nil {
@@ -511,12 +513,7 @@ func (a *API) GenerateCode() ([]byte, error) {
 	for _, res := range reslist {
 		res.generateMethods()
 	}
-
-	clean, err := format.Source(buf.Bytes())
-	if err != nil {
-		return buf.Bytes(), err
-	}
-	return clean, nil
+	return buf.Bytes(), err
 }
 
 func (a *API) generateScopeConstants(indent string) {
@@ -765,19 +762,20 @@ func (t *Type) IsMap() bool {
 
 // MapType checks if the current node is a map and if true, it returns the Go type for the map, such as map[string]string.
 func (t *Type) MapType() (typ string, ok bool) {
+	dictionaryTemplate := "[String: %s]"
 	props := jobj(t.m, "additionalProperties")
 	if props == nil {
 		return "", false
 	}
 	s := jstr(props, "type")
 	if s == "string" {
-		return "map[string]string", true
+		return fmt.Sprintf(dictionaryTemplate, "String"), true
 	}
 	if s != "array" {
 		if s == "" { // Check for reference
 			s = jstr(props, "$ref")
 			if s != "" {
-				return "map[string]" + s, true
+				return fmt.Sprintf(dictionaryTemplate, s), true
 			}
 		}
 		log.Printf("Warning: found map to type %q which is not implemented yet.", s)
@@ -1342,7 +1340,7 @@ func (meth *Method) generateCode() {
 		prefix = initialCap(fmt.Sprintf("%s.%s", res.parent, res.name))
 	}
 	callName := a.GetName(prefix + initialCap(methodName) + "Call")
-	// Call structure
+	pn("// // ...Call struct")
 	p("\nstruct %s {\n", callName)
 	p(swiftIndent + "let s: Service\n")
 	for _, arg := range args.l {
@@ -1350,11 +1348,13 @@ func (meth *Method) generateCode() {
 	}
 	p(swiftIndent + "var opt_: [String: String]\n")
 	if meth.supportsMediaUpload() {
+		pn("/* TODO: upload support")
 		p("\tmedia_     io.Reader\n")
 		p("\tresumable_ googleapi.SizeReaderAt\n")
 		p("\tmediaType_ string\n")
 		p("\tctx_       context.Context\n")
 		p("\tprotocol_  string\n")
+		pn(" TODO: upload support */")		
 	}
 	p("}\n")
 
@@ -1368,12 +1368,12 @@ func (meth *Method) generateCode() {
 	var servicePtr string
 	pn("// // ...Service extension")
 	if res == nil {
-		p("public extension %s {\n", "Service") 
+		p("extension %s {\n", "Service") 
 		p(swiftIndent + "func %s(%s) -> %s {\n", methodName, args, callName)
 		servicePtr = "s"				
 
 	} else {
-		p("public extension %s {\n", res.SwiftType())
+		p("extension %s {\n", res.SwiftType())
 		p(swiftIndent + "func %s(%s) -> %s {\n", methodName, args, callName)
 		servicePtr = "s"
 	}
@@ -1384,9 +1384,12 @@ func (meth *Method) generateCode() {
 	}
 	p(indent + "return c\n")
 	p(swiftIndent + "}\n")
+	pn("}")	
+	pn("")
 	
 	pn("// // ...Call extension")
-	pn("public extension %s {", callName)
+	pn("extension %s {", callName)
+
 
 	servicePtr = "s"	
 	for _, opt := range meth.OptParams() {
@@ -1405,6 +1408,8 @@ func (meth *Method) generateCode() {
 	}
 
 	if meth.supportsMediaUpload() {
+		pn("//TODO: convert media upload")
+		/* 
 		pn("\n// Media specifies the media to upload in a single chunk.")
 		pn("// At most one of Media and ResumableMedia may be set.")
 		pn("func (c *%s) Media(r io.Reader) *%s {", callName, callName)
@@ -1430,6 +1435,7 @@ func (meth *Method) generateCode() {
 		pn(`c.opt_["progressUpdater"] = pu`)
 		pn("return c")
 		pn("}")
+*/
 	}
 
 	pn("\n" + swiftIndent + "// Fields allows partial responses to be retrieved.")
@@ -1441,12 +1447,15 @@ func (meth *Method) generateCode() {
 	pn(indent + "return c")
 	pn(swiftIndent + "}")
 
-	pn("\n" + swiftIndent + "func do(block: (%serror) -> () ) {", retTypeComma)
+	pn("\n" + swiftIndent + "func Do(block: (%serror) -> () ) {", retTypeComma)
 
+	// TODO: convert to swift"
+	/*
 	nilRet := ""
 	if retTypeComma != "" {
 		nilRet = "nil, "
 	}
+*/
 /*
 let json: AnyObject? = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions(0), error: .None)
 
@@ -1555,7 +1564,8 @@ if let j: AnyObject = json {
 */
 
 	if meth.supportsMediaUpload() {
-		// TODO: convert to swift
+		pn("// TODO: convert to swift")
+		/*
 		pn(indent + `if c.protocol_ == "resumable" {`)
 		pn(indent + " req.ContentLength = 0")
 		pn(indent + ` if c.mediaType_ == "" {`)
@@ -1566,6 +1576,7 @@ if let j: AnyObject = json {
 		pn(indent + "} else {")
 		pn(indent + ` req.Header.Set(indent + "Content-Type", ctype)`)
 		pn(indent + "}")
+*/
 	} else if hasContentType {
 		pn(indent + `headers["Content-Type"] = ctype`)		
 	}
@@ -1573,13 +1584,15 @@ if let j: AnyObject = json {
 	pn(indent + `headers["User-Agent"] = "google-api-swift-client/` + goGenVersion + `"`)
 	//pn(indent + "manager.session.configuration.HTTPAdditionalHeaders = headers")
 	pn(indent + "var req = manager.request(.%s, url, body, parameters: params)", httpMethod)	
-	pn(indent + "c.s.client.do(req) { (request, response, json, error) in")
+	pn(indent + "c.s.client.Do(req) { (request, response, json, error) in")
 	pn(indent + swiftIndent + "block(%s.decode(json), error)", responseType(a, meth.m))
 	pn(indent + "}")
 	//pn(indent + "if err != nil { return %serr }", nilRet)
 	//pn(indent + "defer googleapi.CloseBody(res)")
 	//pn(indent + "if err := googleapi.CheckResponse(res); err != nil { return %serr }", nilRet)
 	if meth.supportsMediaUpload() {
+		pn("// TODO: convert to swift")
+		/*
 		pn(indent + `if c.protocol_ == "resumable" {`)
 		pn(indent + ` loc := res.Header.Get("Location")`)
 		pn(indent + " rx := &googleapi.ResumableUpload{")
@@ -1594,7 +1607,9 @@ if let j: AnyObject = json {
 		pn(indent + " if err != nil { return %serr }", nilRet)
 		pn(indent + " defer res.Body.Close()")
 		pn(indent + "}")
+*/
 	}
+	pn(swiftIndent + "}")
 
 	bs, _ := json.MarshalIndent(meth.m, "\t// ", "  ")
 	pn(indent + "// %s\n", string(bs))
@@ -1719,7 +1734,7 @@ func (meth *Method) NewBodyArg(m map[string]interface{}) *argument {
 	return &argument{
 		goname:   validGoIdentifer(strings.ToLower(reftype)),
 		apiname:  "REQUEST",
-		gotype:   "*" + reftype,
+		gotype:   reftype,
 		apitype:  reftype,
 		location: "body",
 	}
@@ -1755,7 +1770,7 @@ type argument struct {
 }
 
 func (a *argument) String() string {
-	return a.goname + " " + a.gotype
+	return a.goname + ": " + a.gotype
 }
 
 func (a *argument) exprAsString(prefix string) string {
@@ -1901,7 +1916,7 @@ func simpleSwiftTypeConvert(apiType, format string) (swifttype string, ok bool) 
 }
 
 func mustSimpleTypeConvert(apiType, format string) string {
-	if gotype, ok := simpleTypeConvert(apiType, format); ok {
+	if gotype, ok := simpleSwiftTypeConvert(apiType, format); ok {
 		return gotype
 	}
 	panic(fmt.Sprintf("failed to simpleTypeConvert(%q, %q)", apiType, format))
