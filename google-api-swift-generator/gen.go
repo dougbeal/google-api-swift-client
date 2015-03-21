@@ -463,7 +463,7 @@ func (a *API) GenerateCode() ([]byte, error) {
 	pn(swiftIndent + "let apiName = %q", jstr(m, "name"))
 	pn(swiftIndent + "let apiVersion = %q", jstr(m, "version"))
 	pn(swiftIndent + "let basePath = %q", a.apiBaseURL())
-	pn(swiftIndent + "let baseURL = NSURL(string: basePath)!")
+	pn(swiftIndent + "let baseURL = NSURL(string: youtube.basePath)!")
 	p("\n")
 	p("// MARK: scope constants\n")	
 	a.generateScopeConstants(swiftIndent)
