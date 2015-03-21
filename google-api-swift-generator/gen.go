@@ -1035,7 +1035,8 @@ func (s *Schema) writeSchemaCode(indent string, api *API) {
 
 // TODO: not converted to swift
 func (s *Schema) writeVariant(api *API, v map[string]interface{}) {
-	s.api.p("\ntype %s map[string]interface{}\n\n", s.GoName())
+	s.api.pn("\nSchema writeVariant")
+	s.api.p("type %s map[string]interface{}\n\n", s.GoName())
 
 	// Write out the "Type" method that identifies the variant type.
 	s.api.p("func (t %s) Type() string {\n", s.GoName())

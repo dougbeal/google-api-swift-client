@@ -12,4 +12,6 @@ cached:
 youtube:
 	go install google.golang.org/api/googleapi
 	go install google.golang.org/api/google-api-swift-generator
-	$(GOPATH)/bin/google-api-swift-generator -cache=true -install -api=youtube:v3
+	$(GOPATH)/bin/google-api-swift-generator -cache=true -build=false -install=false -api=youtube:v3 -output=$(GOPATH)/../swift/
+
+

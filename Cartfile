@@ -1,0 +1,3 @@
+github "thoughtbot/Argo" "master"
+github "thoughtbot/runes" ~> 1.2
+github "Alamofire/Alamofire" "xcode-6.3"
