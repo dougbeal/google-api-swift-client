@@ -1,4 +1,5 @@
 github "Alamofire/Alamofire" "2ff5749ffc0425f05a1411b5b6fd2c25241b5b14"
 github "robrix/Box" "1.2.0"
 github "thoughtbot/runes" "v1.2.2"
+github "jspahrsummers/xcconfigs" "0.7.2"
 github "thoughtbot/Argo" "4faa6e9f045e0d6285cda1e095a41a17bcd987ae"
