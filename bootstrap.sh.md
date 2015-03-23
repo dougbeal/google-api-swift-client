@@ -20,4 +20,14 @@ echo \(compile "cd .. && GOPATH=$GO_ENV make -k youtube" nil\)
 ** github "thoughtbot/runes" ~> 1.2
 ** github "Alamofire/Alamofire" "xcode-6.3"
 ** github "jspahrsummers/xcconfigs" >= 0.6
+* init Cartfile
+```
+security unlock-keychain
+carthage update --use-submodule
+```
+* Further update process
+```
+git submodule foreach git reset --hard
+carthage update --use-submodule
+```
 
