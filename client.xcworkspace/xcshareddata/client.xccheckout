@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>601AFB6C-FCD3-4E3B-9084-C6F418D8892B</string>
+	<key>IDESourceControlProjectName</key>
+	<string>client</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>83FA910552888A60D03E96A62DFC361B425D3FC0</key>
+		<string>https://github.com/dougbeal/google-api-swift-client</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>client.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>83FA910552888A60D03E96A62DFC361B425D3FC0</key>
+		<string>..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/dougbeal/google-api-swift-client</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>83FA910552888A60D03E96A62DFC361B425D3FC0</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>83FA910552888A60D03E96A62DFC361B425D3FC0</string>
+			<key>IDESourceControlWCCName</key>
+			<string>google-api-swift-client</string>
+		</dict>
+	</array>
+</dict>
+</plist>
