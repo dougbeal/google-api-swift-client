@@ -427,7 +427,7 @@ func (a *API) GenerateCode() ([]byte, error) {
 	p("\n")
 	
 	//p("package %s\n", pkg)
-	p("public class %s {\n", pkg)
+	p("public struct %s {\n", pkg)
 
 	// p("import (\n")
 	// for _, pkg := range []string{
@@ -459,19 +459,18 @@ func (a *API) GenerateCode() ([]byte, error) {
 	// pn("var _ = strings.Replace")
 	// pn("var _ = context.Background")
 	// pn("")
-	pn(swiftIndent + "let apiId = %q", jstr(m, "id"))
-	pn(swiftIndent + "let apiName = %q", jstr(m, "name"))
-	pn(swiftIndent + "let apiVersion = %q", jstr(m, "version"))
-	pn(swiftIndent + "let basePath = %q", a.apiBaseURL())
-	pn(swiftIndent + "let baseURL = NSURL(string: youtube.basePath)!")
+	pn(swiftIndent + "static let apiId = %q", jstr(m, "id"))
+	pn(swiftIndent + "static let apiName = %q", jstr(m, "name"))
+	pn(swiftIndent + "static let apiVersion = %q", jstr(m, "version"))
+	pn(swiftIndent + "static let basePath = %q", a.apiBaseURL())
+	pn(swiftIndent + "static let baseURL = NSURL(string: %s.basePath)!", pkg)
 	p("\n")
 	p("// MARK: scope constants\n")	
 	a.generateScopeConstants(swiftIndent)
 	p("\n")
 	a.GetName("New") // ignore return value; we're the first caller	
-	pn(swiftIndent + "class func New(client: Alamofire.Manager) -> Service? {")
-	pn(indent + "if client == nil { return nil }")
-	pn(indent + "BasePath = %s.basePath", pkg)
+	pn(swiftIndent + "static func New(client: Alamofire.Manager) -> Service {")
+	pn(indent + "return Service( client: client, BasePath: %s.basePath)", pkg)
 	/* trying out lazy
 	for _, res := range reslist { // add top level resources.
 		pn(indent + "%s = %s(s)", res.GoField(), res.SwiftType())
@@ -543,7 +542,7 @@ func (a *API) generateScopeConstants(indent string) {
 		if des := jstr(mi.(map[string]interface{}), "description"); des != "" {
 			a.p("%s", asComment(indent + swiftIndent, des))
 		}
-		a.p(indent + swiftIndent + "let %s = %q\n", ident, scopeName)
+		a.p(indent + swiftIndent + "static let %s = %q\n", ident, scopeName)
 	}
 	a.p(indent + "}\n\n")
 }
@@ -1183,7 +1182,7 @@ func (r *Resource) generateType() {
 	var indent = swiftIndent
 	pn(fmt.Sprintf("struct %s {", t))
 	pn(indent + "let s: Service")
-	pn(indent + "let rs: %s", t)		
+	pn(indent + "var rs: %s { get { return self } }", t)		
 	//pn(indent + "rs := &%s{s : s}", t)
 	//TODO: what uses this?
 	for _, res := range r.resources {

@@ -12,6 +12,8 @@
 	<dict>
 		<key>83FA910552888A60D03E96A62DFC361B425D3FC0</key>
 		<string>https://github.com/dougbeal/google-api-swift-client</string>
+		<key>E084C86B03F81D63323C9E7510697EA528A758C7</key>
+		<string>https://github.com/jspahrsummers/xcconfigs.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
 	<string>client.xcworkspace</string>
@@ -19,6 +21,8 @@
 	<dict>
 		<key>83FA910552888A60D03E96A62DFC361B425D3FC0</key>
 		<string>..</string>
+		<key>E084C86B03F81D63323C9E7510697EA528A758C7</key>
+		<string>..Carthage/Checkouts/xcconfigs/</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
 	<string>https://github.com/dougbeal/google-api-swift-client</string>
@@ -35,6 +39,14 @@
 			<string>83FA910552888A60D03E96A62DFC361B425D3FC0</string>
 			<key>IDESourceControlWCCName</key>
 			<string>google-api-swift-client</string>
+		</dict>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>E084C86B03F81D63323C9E7510697EA528A758C7</string>
+			<key>IDESourceControlWCCName</key>
+			<string>xcconfigs</string>
 		</dict>
 	</array>
 </dict>

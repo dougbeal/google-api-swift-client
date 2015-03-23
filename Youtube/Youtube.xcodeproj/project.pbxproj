@@ -10,6 +10,13 @@
 		D1AAE7A11AC0C09900461DEA /* Youtube.h in Headers */ = {isa = PBXBuildFile; fileRef = D1AAE7A01AC0C09900461DEA /* Youtube.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D1AAE7A71AC0C09900461DEA /* Youtube.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1AAE79B1AC0C09900461DEA /* Youtube.framework */; };
 		D1AAE7AE1AC0C09900461DEA /* YoutubeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1AAE7AD1AC0C09900461DEA /* YoutubeTests.swift */; };
+		D1AAE7EA1AC0C3B200461DEA /* Youtube-mac.h in Headers */ = {isa = PBXBuildFile; fileRef = D1AAE7E91AC0C3B200461DEA /* Youtube-mac.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		D1AAE7FF1AC0C77A00461DEA /* youtube-gen.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1AAE7FE1AC0C77A00461DEA /* youtube-gen.swift */; };
+		D1AAE8001AC0C77A00461DEA /* youtube-gen.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1AAE7FE1AC0C77A00461DEA /* youtube-gen.swift */; };
+		D1AAE8011AC0C77A00461DEA /* youtube-gen.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1AAE7FE1AC0C77A00461DEA /* youtube-gen.swift */; };
+		D1AAE8051AC0C7CD00461DEA /* Alamofire.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1AAE8021AC0C7CD00461DEA /* Alamofire.framework */; };
+		D1AAE8061AC0C7CD00461DEA /* Runes.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1AAE8031AC0C7CD00461DEA /* Runes.framework */; };
+		D1AAE8071AC0C7CD00461DEA /* Argo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1AAE8041AC0C7CD00461DEA /* Argo.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -29,6 +36,32 @@
 		D1AAE7A61AC0C09900461DEA /* YoutubeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = YoutubeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D1AAE7AC1AC0C09900461DEA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D1AAE7AD1AC0C09900461DEA /* YoutubeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YoutubeTests.swift; sourceTree = "<group>"; };
+		D1AAE7BA1AC0C13F00461DEA /* Common.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Common.xcconfig; sourceTree = "<group>"; };
+		D1AAE7BC1AC0C13F00461DEA /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
+		D1AAE7BD1AC0C13F00461DEA /* Profile.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Profile.xcconfig; sourceTree = "<group>"; };
+		D1AAE7BE1AC0C13F00461DEA /* Release.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
+		D1AAE7BF1AC0C13F00461DEA /* Test.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Test.xcconfig; sourceTree = "<group>"; };
+		D1AAE7C11AC0C13F00461DEA /* Application.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Application.xcconfig; sourceTree = "<group>"; };
+		D1AAE7C21AC0C13F00461DEA /* Framework.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Framework.xcconfig; sourceTree = "<group>"; };
+		D1AAE7C31AC0C13F00461DEA /* StaticLibrary.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = StaticLibrary.xcconfig; sourceTree = "<group>"; };
+		D1AAE7C51AC0C13F00461DEA /* iOS-Application.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = "iOS-Application.xcconfig"; sourceTree = "<group>"; };
+		D1AAE7C61AC0C13F00461DEA /* iOS-Base.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = "iOS-Base.xcconfig"; sourceTree = "<group>"; };
+		D1AAE7C71AC0C13F00461DEA /* iOS-Framework.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = "iOS-Framework.xcconfig"; sourceTree = "<group>"; };
+		D1AAE7C81AC0C13F00461DEA /* iOS-StaticLibrary.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = "iOS-StaticLibrary.xcconfig"; sourceTree = "<group>"; };
+		D1AAE7CA1AC0C13F00461DEA /* Mac-Application.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = "Mac-Application.xcconfig"; sourceTree = "<group>"; };
+		D1AAE7CB1AC0C13F00461DEA /* Mac-Base.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = "Mac-Base.xcconfig"; sourceTree = "<group>"; };
+		D1AAE7CC1AC0C13F00461DEA /* Mac-DynamicLibrary.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = "Mac-DynamicLibrary.xcconfig"; sourceTree = "<group>"; };
+		D1AAE7CD1AC0C13F00461DEA /* Mac-Framework.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = "Mac-Framework.xcconfig"; sourceTree = "<group>"; };
+		D1AAE7CE1AC0C13F00461DEA /* Mac-StaticLibrary.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = "Mac-StaticLibrary.xcconfig"; sourceTree = "<group>"; };
+		D1AAE7E51AC0C3B200461DEA /* Youtube.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Youtube.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D1AAE7E81AC0C3B200461DEA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D1AAE7E91AC0C3B200461DEA /* Youtube-mac.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Youtube-mac.h"; sourceTree = "<group>"; };
+		D1AAE7F51AC0C3B200461DEA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D1AAE7F61AC0C3B200461DEA /* Youtube_macTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Youtube_macTests.swift; sourceTree = "<group>"; };
+		D1AAE7FE1AC0C77A00461DEA /* youtube-gen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "youtube-gen.swift"; path = "../../build/swift/youtube/v3/youtube-gen.swift"; sourceTree = "<group>"; };
+		D1AAE8021AC0C7CD00461DEA /* Alamofire.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Alamofire.framework; path = ../Carthage/Build/iOS/Alamofire.framework; sourceTree = "<group>"; };
+		D1AAE8031AC0C7CD00461DEA /* Runes.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Runes.framework; path = ../Carthage/Build/iOS/Runes.framework; sourceTree = "<group>"; };
+		D1AAE8041AC0C7CD00461DEA /* Argo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Argo.framework; path = ../Carthage/Build/iOS/Argo.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -36,6 +69,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D1AAE8061AC0C7CD00461DEA /* Runes.framework in Frameworks */,
+				D1AAE8051AC0C7CD00461DEA /* Alamofire.framework in Frameworks */,
+				D1AAE8071AC0C7CD00461DEA /* Argo.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -47,12 +83,23 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D1AAE7E11AC0C3B200461DEA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		D1AAE7911AC0C09900461DEA = {
 			isa = PBXGroup;
 			children = (
+				D1AAE7B81AC0C10D00461DEA /* Configuration */,
+				D1AAE7E61AC0C3B200461DEA /* Youtube-mac */,
+				D1AAE7F31AC0C3B200461DEA /* Youtube-macTests */,
+				D1AAE7B71AC0C10000461DEA /* Frameworks */,
 				D1AAE79D1AC0C09900461DEA /* Youtube */,
 				D1AAE7AA1AC0C09900461DEA /* YoutubeTests */,
 				D1AAE79C1AC0C09900461DEA /* Products */,
@@ -64,6 +111,7 @@
 			children = (
 				D1AAE79B1AC0C09900461DEA /* Youtube.framework */,
 				D1AAE7A61AC0C09900461DEA /* YoutubeTests.xctest */,
+				D1AAE7E51AC0C3B200461DEA /* Youtube.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -71,6 +119,7 @@
 		D1AAE79D1AC0C09900461DEA /* Youtube */ = {
 			isa = PBXGroup;
 			children = (
+				D1AAE7FE1AC0C77A00461DEA /* youtube-gen.swift */,
 				D1AAE7A01AC0C09900461DEA /* Youtube.h */,
 				D1AAE79E1AC0C09900461DEA /* Supporting Files */,
 			);
@@ -102,6 +151,117 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		D1AAE7B71AC0C10000461DEA /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				D1AAE8021AC0C7CD00461DEA /* Alamofire.framework */,
+				D1AAE8031AC0C7CD00461DEA /* Runes.framework */,
+				D1AAE8041AC0C7CD00461DEA /* Argo.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		D1AAE7B81AC0C10D00461DEA /* Configuration */ = {
+			isa = PBXGroup;
+			children = (
+				D1AAE7B91AC0C13F00461DEA /* Base */,
+				D1AAE7C41AC0C13F00461DEA /* iOS */,
+				D1AAE7C91AC0C13F00461DEA /* Mac OS X */,
+			);
+			name = Configuration;
+			sourceTree = "<group>";
+		};
+		D1AAE7B91AC0C13F00461DEA /* Base */ = {
+			isa = PBXGroup;
+			children = (
+				D1AAE7BA1AC0C13F00461DEA /* Common.xcconfig */,
+				D1AAE7BB1AC0C13F00461DEA /* Configurations */,
+				D1AAE7C01AC0C13F00461DEA /* Targets */,
+			);
+			name = Base;
+			path = ../Carthage/Checkouts/xcconfigs/Base;
+			sourceTree = "<group>";
+		};
+		D1AAE7BB1AC0C13F00461DEA /* Configurations */ = {
+			isa = PBXGroup;
+			children = (
+				D1AAE7BC1AC0C13F00461DEA /* Debug.xcconfig */,
+				D1AAE7BD1AC0C13F00461DEA /* Profile.xcconfig */,
+				D1AAE7BE1AC0C13F00461DEA /* Release.xcconfig */,
+				D1AAE7BF1AC0C13F00461DEA /* Test.xcconfig */,
+			);
+			path = Configurations;
+			sourceTree = "<group>";
+		};
+		D1AAE7C01AC0C13F00461DEA /* Targets */ = {
+			isa = PBXGroup;
+			children = (
+				D1AAE7C11AC0C13F00461DEA /* Application.xcconfig */,
+				D1AAE7C21AC0C13F00461DEA /* Framework.xcconfig */,
+				D1AAE7C31AC0C13F00461DEA /* StaticLibrary.xcconfig */,
+			);
+			path = Targets;
+			sourceTree = "<group>";
+		};
+		D1AAE7C41AC0C13F00461DEA /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				D1AAE7C51AC0C13F00461DEA /* iOS-Application.xcconfig */,
+				D1AAE7C61AC0C13F00461DEA /* iOS-Base.xcconfig */,
+				D1AAE7C71AC0C13F00461DEA /* iOS-Framework.xcconfig */,
+				D1AAE7C81AC0C13F00461DEA /* iOS-StaticLibrary.xcconfig */,
+			);
+			name = iOS;
+			path = ../Carthage/Checkouts/xcconfigs/iOS;
+			sourceTree = "<group>";
+		};
+		D1AAE7C91AC0C13F00461DEA /* Mac OS X */ = {
+			isa = PBXGroup;
+			children = (
+				D1AAE7CA1AC0C13F00461DEA /* Mac-Application.xcconfig */,
+				D1AAE7CB1AC0C13F00461DEA /* Mac-Base.xcconfig */,
+				D1AAE7CC1AC0C13F00461DEA /* Mac-DynamicLibrary.xcconfig */,
+				D1AAE7CD1AC0C13F00461DEA /* Mac-Framework.xcconfig */,
+				D1AAE7CE1AC0C13F00461DEA /* Mac-StaticLibrary.xcconfig */,
+			);
+			name = "Mac OS X";
+			path = "../Carthage/Checkouts/xcconfigs/Mac OS X";
+			sourceTree = "<group>";
+		};
+		D1AAE7E61AC0C3B200461DEA /* Youtube-mac */ = {
+			isa = PBXGroup;
+			children = (
+				D1AAE7E91AC0C3B200461DEA /* Youtube-mac.h */,
+				D1AAE7E71AC0C3B200461DEA /* Supporting Files */,
+			);
+			path = "Youtube-mac";
+			sourceTree = "<group>";
+		};
+		D1AAE7E71AC0C3B200461DEA /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				D1AAE7E81AC0C3B200461DEA /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		D1AAE7F31AC0C3B200461DEA /* Youtube-macTests */ = {
+			isa = PBXGroup;
+			children = (
+				D1AAE7F61AC0C3B200461DEA /* Youtube_macTests.swift */,
+				D1AAE7F41AC0C3B200461DEA /* Supporting Files */,
+			);
+			path = "Youtube-macTests";
+			sourceTree = "<group>";
+		};
+		D1AAE7F41AC0C3B200461DEA /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				D1AAE7F51AC0C3B200461DEA /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -113,12 +273,20 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D1AAE7E21AC0C3B200461DEA /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D1AAE7EA1AC0C3B200461DEA /* Youtube-mac.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		D1AAE79A1AC0C09900461DEA /* Youtube */ = {
+		D1AAE79A1AC0C09900461DEA /* Youtube-iOS */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = D1AAE7B11AC0C09900461DEA /* Build configuration list for PBXNativeTarget "Youtube" */;
+			buildConfigurationList = D1AAE7B11AC0C09900461DEA /* Build configuration list for PBXNativeTarget "Youtube-iOS" */;
 			buildPhases = (
 				D1AAE7961AC0C09900461DEA /* Sources */,
 				D1AAE7971AC0C09900461DEA /* Frameworks */,
@@ -129,7 +297,7 @@
 			);
 			dependencies = (
 			);
-			name = Youtube;
+			name = "Youtube-iOS";
 			productName = Youtube;
 			productReference = D1AAE79B1AC0C09900461DEA /* Youtube.framework */;
 			productType = "com.apple.product-type.framework";
@@ -152,6 +320,24 @@
 			productReference = D1AAE7A61AC0C09900461DEA /* YoutubeTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		D1AAE7E41AC0C3B200461DEA /* Youtube-mac */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D1AAE7F81AC0C3B200461DEA /* Build configuration list for PBXNativeTarget "Youtube-mac" */;
+			buildPhases = (
+				D1AAE7E01AC0C3B200461DEA /* Sources */,
+				D1AAE7E11AC0C3B200461DEA /* Frameworks */,
+				D1AAE7E21AC0C3B200461DEA /* Headers */,
+				D1AAE7E31AC0C3B200461DEA /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Youtube-mac";
+			productName = "Youtube-mac";
+			productReference = D1AAE7E51AC0C3B200461DEA /* Youtube.framework */;
+			productType = "com.apple.product-type.framework";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -165,6 +351,9 @@
 						CreatedOnToolsVersion = 6.3;
 					};
 					D1AAE7A51AC0C09900461DEA = {
+						CreatedOnToolsVersion = 6.3;
+					};
+					D1AAE7E41AC0C3B200461DEA = {
 						CreatedOnToolsVersion = 6.3;
 					};
 				};
@@ -181,8 +370,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				D1AAE79A1AC0C09900461DEA /* Youtube */,
+				D1AAE79A1AC0C09900461DEA /* Youtube-iOS */,
 				D1AAE7A51AC0C09900461DEA /* YoutubeTests */,
+				D1AAE7E41AC0C3B200461DEA /* Youtube-mac */,
 			);
 		};
 /* End PBXProject section */
@@ -202,6 +392,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D1AAE7E31AC0C3B200461DEA /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -209,6 +406,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D1AAE7FF1AC0C77A00461DEA /* youtube-gen.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -216,7 +414,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D1AAE8001AC0C77A00461DEA /* youtube-gen.swift in Sources */,
 				D1AAE7AE1AC0C09900461DEA /* YoutubeTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D1AAE7E01AC0C3B200461DEA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D1AAE8011AC0C77A00461DEA /* youtube-gen.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -225,7 +432,7 @@
 /* Begin PBXTargetDependency section */
 		D1AAE7A91AC0C09900461DEA /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = D1AAE79A1AC0C09900461DEA /* Youtube */;
+			target = D1AAE79A1AC0C09900461DEA /* Youtube-iOS */;
 			targetProxy = D1AAE7A81AC0C09900461DEA /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -233,6 +440,7 @@
 /* Begin XCBuildConfiguration section */
 		D1AAE7AF1AC0C09900461DEA /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D1AAE7BC1AC0C13F00461DEA /* Debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
@@ -268,7 +476,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -281,6 +489,7 @@
 		};
 		D1AAE7B01AC0C09900461DEA /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D1AAE7BE1AC0C13F00461DEA /* Release.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
@@ -310,7 +519,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -322,36 +531,29 @@
 		};
 		D1AAE7B21AC0C09900461DEA /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D1AAE7C71AC0C13F00461DEA /* iOS-Framework.xcconfig */;
 			buildSettings = {
-				DEFINES_MODULE = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = Youtube/Info.plist;
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"/Users/dougbeal/git/google-api-swift-client/Carthage/Build/iOS",
+				);
 			};
 			name = Debug;
 		};
 		D1AAE7B31AC0C09900461DEA /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D1AAE7C71AC0C13F00461DEA /* iOS-Framework.xcconfig */;
 			buildSettings = {
-				DEFINES_MODULE = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = Youtube/Info.plist;
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"/Users/dougbeal/git/google-api-swift-client/Carthage/Build/iOS",
+				);
 			};
 			name = Release;
 		};
 		D1AAE7B51AC0C09900461DEA /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D1AAE7BF1AC0C13F00461DEA /* Test.xcconfig */;
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
@@ -369,6 +571,7 @@
 		};
 		D1AAE7B61AC0C09900461DEA /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D1AAE7BF1AC0C13F00461DEA /* Test.xcconfig */;
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
@@ -377,6 +580,20 @@
 				INFOPLIST_FILE = YoutubeTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		D1AAE7F91AC0C3B200461DEA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = D1AAE7CD1AC0C13F00461DEA /* Mac-Framework.xcconfig */;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		D1AAE7FA1AC0C3B200461DEA /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = D1AAE7CD1AC0C13F00461DEA /* Mac-Framework.xcconfig */;
+			buildSettings = {
 			};
 			name = Release;
 		};
@@ -392,7 +609,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		D1AAE7B11AC0C09900461DEA /* Build configuration list for PBXNativeTarget "Youtube" */ = {
+		D1AAE7B11AC0C09900461DEA /* Build configuration list for PBXNativeTarget "Youtube-iOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				D1AAE7B21AC0C09900461DEA /* Debug */,
@@ -405,6 +622,14 @@
 			buildConfigurations = (
 				D1AAE7B51AC0C09900461DEA /* Debug */,
 				D1AAE7B61AC0C09900461DEA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		D1AAE7F81AC0C3B200461DEA /* Build configuration list for PBXNativeTarget "Youtube-mac" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D1AAE7F91AC0C3B200461DEA /* Debug */,
+				D1AAE7FA1AC0C3B200461DEA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 		};

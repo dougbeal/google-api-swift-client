@@ -1,4 +1,3 @@
-github "thoughtbot/Argo" >= 0.4.3
+github "thoughtbot/Argo" "master"
 github "thoughtbot/runes" ~> 1.2
 github "Alamofire/Alamofire" "xcode-6.3"
-github "jspahrsummers/xcconfigs" >= 0.6
