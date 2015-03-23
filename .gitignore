@@ -36,4 +36,4 @@ google-api-go-generator/google-api-go-gen
 *.out
 
 build/
-Carthage/
+Carthage.build

@@ -13,5 +13,11 @@ GOPATH="$GO_ENV" go get golang.org/x/net/context
 echo GOPATH="$GO_ENV" make
 echo \(compile "cd .. && GOPATH=$GO_ENV make -k youtube" nil\)
 ```
-* test
+# xcode setup
+* add Carthage.build to .gitignore
+* setup Cartfile
+** github "thoughtbot/Argo" >= 0.4.3
+** github "thoughtbot/runes" ~> 1.2
+** github "Alamofire/Alamofire" "xcode-6.3"
+** github "jspahrsummers/xcconfigs" >= 0.6
 
