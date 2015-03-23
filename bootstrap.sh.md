@@ -27,7 +27,7 @@ carthage update --use-submodule
 ```
 * Further update process
 ```
-git submodule foreach git reset --hard
+git submodule foreach --recursive git clean -f -d
 carthage update --use-submodule
 ```
 
