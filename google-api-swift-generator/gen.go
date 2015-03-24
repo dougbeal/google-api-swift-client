@@ -1124,8 +1124,8 @@ func (s *Schema) writeSchemaStruct(indent string, api *API) {
 			s.api.p(indent + swiftIndent + swiftIndent + "<*> ")			
 		}
 		
-		pname := p.GoName()
-		s.api.p("j <|? %s\n", pname)
+		pname := p.apiName
+		s.api.pn(`j <|? "%s"`, pname)
 
 	}
 	s.api.pn(indent + "}")

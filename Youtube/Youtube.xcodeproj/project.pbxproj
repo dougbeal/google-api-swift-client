@@ -17,6 +17,7 @@
 		D1AAE8051AC0C7CD00461DEA /* Alamofire.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1AAE8021AC0C7CD00461DEA /* Alamofire.framework */; };
 		D1AAE8061AC0C7CD00461DEA /* Runes.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1AAE8031AC0C7CD00461DEA /* Runes.framework */; };
 		D1AAE8071AC0C7CD00461DEA /* Argo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1AAE8041AC0C7CD00461DEA /* Argo.framework */; };
+		D1AAE8091AC0D7FE00461DEA /* Box.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1AAE8081AC0D7FE00461DEA /* Box.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -62,6 +63,7 @@
 		D1AAE8021AC0C7CD00461DEA /* Alamofire.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Alamofire.framework; path = ../Carthage/Build/iOS/Alamofire.framework; sourceTree = "<group>"; };
 		D1AAE8031AC0C7CD00461DEA /* Runes.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Runes.framework; path = ../Carthage/Build/iOS/Runes.framework; sourceTree = "<group>"; };
 		D1AAE8041AC0C7CD00461DEA /* Argo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Argo.framework; path = ../Carthage/Build/iOS/Argo.framework; sourceTree = "<group>"; };
+		D1AAE8081AC0D7FE00461DEA /* Box.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Box.framework; path = ../Carthage/Build/iOS/Box.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -71,6 +73,7 @@
 			files = (
 				D1AAE8061AC0C7CD00461DEA /* Runes.framework in Frameworks */,
 				D1AAE8051AC0C7CD00461DEA /* Alamofire.framework in Frameworks */,
+				D1AAE8091AC0D7FE00461DEA /* Box.framework in Frameworks */,
 				D1AAE8071AC0C7CD00461DEA /* Argo.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -154,6 +157,7 @@
 		D1AAE7B71AC0C10000461DEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				D1AAE8081AC0D7FE00461DEA /* Box.framework */,
 				D1AAE8021AC0C7CD00461DEA /* Alamofire.framework */,
 				D1AAE8031AC0C7CD00461DEA /* Runes.framework */,
 				D1AAE8041AC0C7CD00461DEA /* Argo.framework */,
@@ -292,6 +296,7 @@
 				D1AAE7971AC0C09900461DEA /* Frameworks */,
 				D1AAE7981AC0C09900461DEA /* Headers */,
 				D1AAE7991AC0C09900461DEA /* Resources */,
+				D1AAE80A1AC0DEB400461DEA /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -401,6 +406,26 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		D1AAE80A1AC0DEB400461DEA /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/Carthage/Build/iOS/Box.framework",
+				"$(SRCROOT)/Carthage/Build/iOS/Alamofire.framework",
+				"$(SRCROOT)/Carthage/Build/iOS/Runes.framework",
+				"$(SRCROOT)/Carthage/Build/iOS/Argo.framework",
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = "/usr/local/bin/carthage copy-frameworks";
+			shellScript = "";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		D1AAE7961AC0C09900461DEA /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -477,6 +502,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -520,6 +546,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -616,6 +643,7 @@
 				D1AAE7B31AC0C09900461DEA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		D1AAE7B41AC0C09900461DEA /* Build configuration list for PBXNativeTarget "YoutubeTests" */ = {
 			isa = XCConfigurationList;
@@ -624,6 +652,7 @@
 				D1AAE7B61AC0C09900461DEA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		D1AAE7F81AC0C3B200461DEA /* Build configuration list for PBXNativeTarget "Youtube-mac" */ = {
 			isa = XCConfigurationList;
@@ -632,6 +661,7 @@
 				D1AAE7FA1AC0C3B200461DEA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

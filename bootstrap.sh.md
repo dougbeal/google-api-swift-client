@@ -30,4 +30,18 @@ carthage update --use-submodule
 git submodule foreach --recursive git clean -f -d
 carthage update --use-submodule
 ```
+* Carthage Frameworks
+** Drag from `Carthage/Build/<Platform>]` to `Frameworks`
+** OS X
+*** On your application targets’ “General” settings tab, in the “Embedded Binaries” section, drag and drop each framework you want to use from the Carthage/Build folder on disk.
+** iOS
+*** On your application targets’ “General” settings tab, in the “Linked Frameworks and Libraries” section, drag and drop each framework you want to use from the Carthage/Build folder on disk.
+*** On your application targets’ “Build Phases” settings tab, click the “+” icon and choose “New Run Script Phase”. Create a Run Script with the following contents:
 
+/usr/local/bin/carthage copy-frameworks
+and add the paths to the frameworks you want to use under “Input Files”, e.g.:
+
+$(SRCROOT)/Carthage/Build/iOS/LlamaKit.framework
+$(SRCROOT)/Carthage/Build/iOS/ReactiveCocoa.framework
+
+This script works around an App Store submission bug triggered by universal binaries.
