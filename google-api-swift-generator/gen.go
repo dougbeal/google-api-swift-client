@@ -484,11 +484,18 @@ func (a *API) GenerateCode() ([]byte, error) {
 	p("//service\n")
 	a.GetName("Service") // ignore return value; no user-defined names yet
 	p("\nstruct Service {\n")
+	pn(swiftIndent + "init(client: Alamofire.Manager, BasePath: String) {")
+	pn("%sself.client = client", swiftIndent + swiftIndent)
+	pn("%sself.BasePath = BasePath", swiftIndent + swiftIndent)		
+	for _, res := range reslist {
+		pn("%sself.%s = %s(s: self)", swiftIndent + swiftIndent, res.GoField(), res.SwiftType())
+	}	
+	pn(swiftIndent + "}")
 	p(swiftIndent + "let client: Alamofire.Manager\n")
 	p(swiftIndent + "let BasePath: String // API endpoint base URL\n")
 
 	for _, res := range reslist {
-		p("%slazy var %s: %s = %s(s: self)\n", swiftIndent, res.GoField(), res.SwiftType(), res.SwiftType())
+		p("%slet %s: %s\n", swiftIndent, res.GoField(), res.SwiftType())
 	}
 	pn("")
 
@@ -1077,7 +1084,7 @@ func (s *Schema) writeSchemaStruct(indent string, api *API) {
 		if i > 0 {
 			s.api.p("\n")
 		}
-		pname := p.GoName()
+		pname := p.apiName
 		if des := p.Description(); des != "" {
 			s.api.p("%s", asComment(indent, fmt.Sprintf("%s: %s", pname, des)))
 		}
@@ -1096,7 +1103,7 @@ func (s *Schema) writeSchemaStruct(indent string, api *API) {
 		if i > 0 {
 			s.api.p(", ")
 		}
-		pname := p.GoName()
+		pname := p.apiName
 		ptype := p.Type().AsSwift()
 		s.api.p("%s: %s", pname, ptype)
 
@@ -1107,7 +1114,7 @@ func (s *Schema) writeSchemaStruct(indent string, api *API) {
 		if i > 0 {
 			s.api.p(", ")
 		}
-		pname := p.GoName()
+		pname := p.apiName
 		s.api.p("%s: %s", pname, pname)
 		
 	}
@@ -1121,11 +1128,16 @@ func (s *Schema) writeSchemaStruct(indent string, api *API) {
 		if i > 0 {
 			s.api.p(indent + swiftIndent + swiftIndent + "<^> ")
 		} else {
-			s.api.p(indent + swiftIndent + swiftIndent + "<*> ")			
+			s.api.p(indent + swiftIndent + swiftIndent + "<*> ")
 		}
 		
 		pname := p.apiName
-		s.api.pn(`j <|? "%s"`, pname)
+		// TODO: Can't have all conditional types in structs
+		if _, ok := p.Type().ArrayType(); ok {	
+			s.api.pn(`j <|| "%s"`, pname)
+		} else {
+			s.api.pn(`j <| "%s"`, pname)			
+		}
 
 	}
 	s.api.pn(indent + "}")
