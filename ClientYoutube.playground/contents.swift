@@ -9,6 +9,43 @@
 //   youtubeService, err := youtube.New(oauthHttpClient)
 import Foundation
 import Alamofire
+import Runes
+import Argo
+
+import Argo
+import Runes
+
+struct User {
+    let id: Int
+    let name: String
+    let email: String?
+}
+
+extension User: JSONDecodable {
+    static func create(id: Int)(name: String)(email: String?) -> User {
+        return User(id: id, name: name, email: email)
+    }
+    
+    static func decode(j: JSON) -> Decoded<User> {
+        return User.create
+            <^> j <| "id"
+            <*> j <| "name"
+            <*> j <|? "email"
+    }
+}
+
+
+// Package youtube provides access to the YouTube Data API.
+//
+// See https://developers.google.com/youtube/v3
+//
+// Usage example:
+//
+//   import "google.golang.org/api/youtube/v3"
+//   ...
+//   youtubeService, err := youtube.New(oauthHttpClient)
+import Foundation
+import Alamofire
 import Argo
 import Runes
 
@@ -165,42 +202,27 @@ struct WatermarksService {
 // writeSchemaCode
 
 // writeSchemaStruct
-
 struct AccessPolicy: JSONDecodable {
     // allowed: The value of allowed indicates whether the access to the
     // policy is allowed or denied by default.
-    let allowed: Bool //  json:"allowed,omitempty"
+    let allowed: Bool? //  json:"allowed,omitempty"
     
     // exception: A list of region codes that identify countries where the
     // default policy do not apply.
-    let exception: [String] //  json:"exception,omitempty"
+    let exception: [String]? //  json:"exception,omitempty"
     
-    static func create (allowed: Bool, exception: [String]) -> AccessPolicy {
+    static func create(allowed: Bool)(exception: [String]) -> AccessPolicy {
         return AccessPolicy(allowed: allowed, exception: exception)
     }
     
     static func decode (j: JSON) -> Decoded<AccessPolicy> {
         return AccessPolicy.create
-            <*> j <| "allowed"
-            <^> j <|| "exception"
+        <^> j <|? "allowed"
+        <*> j <||? "exception"
     }
 }
 
-
-class JSONFileReader {
-    class func JSON(fromFile file: String) -> AnyObject? {
-        let path = NSBundle(forClass: self).pathForResource(file, ofType: "json")
-        
-        if path != nil {
-            if let data = NSData(contentsOfFile: path!) {
-                return NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions(0), error: nil)
-            }
-        }
-        
-        return .None
-    }
-}
-json = JSONFileReader.JSON(fromFile: "test.json")
+var json = JSONFileReader.JSON(fromFile: "test.json")
 AccessPolicy.decode(json)
 
 

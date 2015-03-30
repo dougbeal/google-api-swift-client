@@ -10,6 +10,12 @@
 	<string>client</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
+		<key>39CB70283A1C33AFB5FF861E924945826EDC74FE</key>
+		<string>https://github.com/thoughtbot/Argo.git</string>
+		<key>57C931977B7D2307CC013C2BD93F90CF7C676790</key>
+		<string>https://github.com/robrix/Box.git</string>
+		<key>67620B5EFA902936DF04070AF595B76AB0333747</key>
+		<string>https://github.com/Alamofire/Alamofire.git</string>
 		<key>83FA910552888A60D03E96A62DFC361B425D3FC0</key>
 		<string>https://github.com/dougbeal/google-api-swift-client</string>
 		<key>E084C86B03F81D63323C9E7510697EA528A758C7</key>
@@ -19,10 +25,16 @@
 	<string>client.xcworkspace</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
+		<key>39CB70283A1C33AFB5FF861E924945826EDC74FE</key>
+		<string>../Carthage/Checkouts/Argo</string>
+		<key>57C931977B7D2307CC013C2BD93F90CF7C676790</key>
+		<string>../Carthage/Checkouts/Box</string>
+		<key>67620B5EFA902936DF04070AF595B76AB0333747</key>
+		<string>../Carthage/Checkouts/Alamofire</string>
 		<key>83FA910552888A60D03E96A62DFC361B425D3FC0</key>
 		<string>..</string>
 		<key>E084C86B03F81D63323C9E7510697EA528A758C7</key>
-		<string>..Carthage/Checkouts/xcconfigs/</string>
+		<string>..Carthage/Checkouts/xcconfigs</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
 	<string>https://github.com/dougbeal/google-api-swift-client</string>
@@ -32,6 +44,30 @@
 	<string>83FA910552888A60D03E96A62DFC361B425D3FC0</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>67620B5EFA902936DF04070AF595B76AB0333747</string>
+			<key>IDESourceControlWCCName</key>
+			<string>Alamofire</string>
+		</dict>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>39CB70283A1C33AFB5FF861E924945826EDC74FE</string>
+			<key>IDESourceControlWCCName</key>
+			<string>Argo</string>
+		</dict>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>57C931977B7D2307CC013C2BD93F90CF7C676790</string>
+			<key>IDESourceControlWCCName</key>
+			<string>Box</string>
+		</dict>
 		<dict>
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>

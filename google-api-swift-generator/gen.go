@@ -1084,7 +1084,7 @@ func (s *Schema) writeSchemaStruct(indent string, api *API) {
 		if i > 0 {
 			s.api.p("\n")
 		}
-		pname := p.apiName
+		pname := validSwiftIdentifer(p.apiName)
 		if des := p.Description(); des != "" {
 			s.api.p("%s", asComment(indent, fmt.Sprintf("%s: %s", pname, des)))
 		}
@@ -1098,12 +1098,12 @@ func (s *Schema) writeSchemaStruct(indent string, api *API) {
 	}
 
 	// create function
-	s.api.p("\n" + indent + "static func create (")
+	s.api.p("\n" + indent + "static func create(")
 	for i, p := range s.properties() {
 		if i > 0 {
-			s.api.p(", ")
+			s.api.p(")(")
 		}
-		pname := p.apiName
+		pname := validSwiftIdentifer(p.apiName)
 		ptype := p.Type().AsSwift()
 		s.api.p("%s: %s", pname, ptype)
 
@@ -1114,7 +1114,7 @@ func (s *Schema) writeSchemaStruct(indent string, api *API) {
 		if i > 0 {
 			s.api.p(", ")
 		}
-		pname := p.apiName
+		pname := validSwiftIdentifer(p.apiName)
 		s.api.p("%s: %s", pname, pname)
 		
 	}
@@ -1126,9 +1126,9 @@ func (s *Schema) writeSchemaStruct(indent string, api *API) {
 	s.api.pn(indent + swiftIndent + "return %s.create",  s.GoName())
 	for i, p := range s.properties() {
 		if i > 0 {
-			s.api.p(indent + swiftIndent + swiftIndent + "<^> ")
-		} else {
 			s.api.p(indent + swiftIndent + swiftIndent + "<*> ")
+		} else {
+			s.api.p(indent + swiftIndent + swiftIndent + "<^> ")
 		}
 		
 		pname := p.apiName
@@ -1411,7 +1411,7 @@ func (meth *Method) generateCode() {
 		p("\n%s", asComment(swiftIndent, fmt.Sprintf("%s sets the optional parameter %q: %s", setter, opt.name, des)))
 		np := new(namePool)
 		np.Get("c") // take the receiver's name
-		paramName := np.Get(validGoIdentifer(opt.name))
+		paramName := np.Get(validSwiftIdentifer(opt.name))
 		p(swiftIndent + "func %s(%s: %s) -> %s {\n", setter, paramName, opt.SwiftType(), callName)
 		p(indent + "c.opt_[%q] = %s\n", opt.name, paramName)
 		p(indent + "return c\n")
@@ -1978,6 +1978,19 @@ func initialCap(ident string) string {
 }
 
 func validGoIdentifer(ident string) string {
+	id := depunct(ident, false)
+	switch id {
+	case "break", "default", "func", "interface", "select",
+		"case", "defer", "go", "map", "struct",
+		"chan", "else", "goto", "package", "switch",
+		"const", "fallthrough", "if", "range", "type",
+		"continue", "for", "import", "return", "var":
+		return id + "_"
+	}
+	return id
+}
+
+func validSwiftIdentifer(ident string) string {
 	id := depunct(ident, false)
 	switch id {
 	case "break", "default", "func", "interface", "select",

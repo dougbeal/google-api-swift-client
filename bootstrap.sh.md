@@ -20,15 +20,15 @@ echo \(compile "cd .. && GOPATH=$GO_ENV make -k youtube" nil\)
 ** github "thoughtbot/runes" ~> 1.2
 ** github "Alamofire/Alamofire" "xcode-6.3"
 ** github "jspahrsummers/xcconfigs" >= 0.6
-* init Cartfile
+* init Cartfile (--no-use-binaries to get Runes project for playground)
 ```
 security unlock-keychain
-carthage update --use-submodule
+carthage update --use-submodule --no-use-binaries
 ```
-* Further update process
+* Further update process (--no-use-binaries to get Runes project for playground)
 ```
 git submodule foreach --recursive git clean -f -d
-carthage update --use-submodule
+carthage update --use-submodule --no-use-binaries
 ```
 * Carthage Frameworks
 ** Drag from `Carthage/Build/<Platform>]` to `Frameworks`
