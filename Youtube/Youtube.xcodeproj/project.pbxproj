@@ -7,10 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		D19F40341AC1088100EE3ACC /* Box.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1AAE8081AC0D7FE00461DEA /* Box.framework */; };
 		D19F40351AC1088100EE3ACC /* Alamofire.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1AAE8021AC0C7CD00461DEA /* Alamofire.framework */; };
-		D19F40361AC1088200EE3ACC /* Runes.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1AAE8031AC0C7CD00461DEA /* Runes.framework */; };
-		D19F40371AC1088200EE3ACC /* Argo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1AAE8041AC0C7CD00461DEA /* Argo.framework */; };
 		D1AAE7A11AC0C09900461DEA /* Youtube.h in Headers */ = {isa = PBXBuildFile; fileRef = D1AAE7A01AC0C09900461DEA /* Youtube.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D1AAE7A71AC0C09900461DEA /* Youtube.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1AAE79B1AC0C09900461DEA /* Youtube.framework */; };
 		D1AAE7AE1AC0C09900461DEA /* YoutubeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1AAE7AD1AC0C09900461DEA /* YoutubeTests.swift */; };
@@ -18,9 +15,11 @@
 		D1AAE7FF1AC0C77A00461DEA /* youtube-gen.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1AAE7FE1AC0C77A00461DEA /* youtube-gen.swift */; };
 		D1AAE8011AC0C77A00461DEA /* youtube-gen.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1AAE7FE1AC0C77A00461DEA /* youtube-gen.swift */; };
 		D1AAE8051AC0C7CD00461DEA /* Alamofire.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1AAE8021AC0C7CD00461DEA /* Alamofire.framework */; };
-		D1AAE8061AC0C7CD00461DEA /* Runes.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1AAE8031AC0C7CD00461DEA /* Runes.framework */; };
-		D1AAE8071AC0C7CD00461DEA /* Argo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1AAE8041AC0C7CD00461DEA /* Argo.framework */; };
-		D1AAE8091AC0D7FE00461DEA /* Box.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1AAE8081AC0D7FE00461DEA /* Box.framework */; };
+		D1BE25541ACB6F4300D91E39 /* SwiftyJSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1BE25531ACB6F4300D91E39 /* SwiftyJSON.framework */; };
+		D1BE25561ACB718300D91E39 /* JSONTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1BE25551ACB718300D91E39 /* JSONTests.swift */; };
+		D1BE25581ACF3FC600D91E39 /* Field.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1BE25571ACF3FC600D91E39 /* Field.swift */; };
+		D1BE25591ACF3FC600D91E39 /* Field.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1BE25571ACF3FC600D91E39 /* Field.swift */; };
+		D1BE255A1ACF40B500D91E39 /* Field.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1BE25571ACF3FC600D91E39 /* Field.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -64,9 +63,9 @@
 		D1AAE7F61AC0C3B200461DEA /* Youtube_macTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Youtube_macTests.swift; sourceTree = "<group>"; };
 		D1AAE7FE1AC0C77A00461DEA /* youtube-gen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "youtube-gen.swift"; path = "../../build/swift/youtube/v3/youtube-gen.swift"; sourceTree = "<group>"; };
 		D1AAE8021AC0C7CD00461DEA /* Alamofire.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Alamofire.framework; path = ../Carthage/Build/iOS/Alamofire.framework; sourceTree = "<group>"; };
-		D1AAE8031AC0C7CD00461DEA /* Runes.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Runes.framework; path = ../Carthage/Build/iOS/Runes.framework; sourceTree = "<group>"; };
-		D1AAE8041AC0C7CD00461DEA /* Argo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Argo.framework; path = ../Carthage/Build/iOS/Argo.framework; sourceTree = "<group>"; };
-		D1AAE8081AC0D7FE00461DEA /* Box.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Box.framework; path = ../Carthage/Build/iOS/Box.framework; sourceTree = "<group>"; };
+		D1BE25531ACB6F4300D91E39 /* SwiftyJSON.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftyJSON.framework; path = ../Carthage/Build/iOS/SwiftyJSON.framework; sourceTree = "<group>"; };
+		D1BE25551ACB718300D91E39 /* JSONTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONTests.swift; sourceTree = "<group>"; };
+		D1BE25571ACF3FC600D91E39 /* Field.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Field.swift; path = ../../Field.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -74,10 +73,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D1AAE8061AC0C7CD00461DEA /* Runes.framework in Frameworks */,
+				D1BE25541ACB6F4300D91E39 /* SwiftyJSON.framework in Frameworks */,
 				D1AAE8051AC0C7CD00461DEA /* Alamofire.framework in Frameworks */,
-				D1AAE8091AC0D7FE00461DEA /* Box.framework in Frameworks */,
-				D1AAE8071AC0C7CD00461DEA /* Argo.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -86,10 +83,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D1AAE7A71AC0C09900461DEA /* Youtube.framework in Frameworks */,
-				D19F40341AC1088100EE3ACC /* Box.framework in Frameworks */,
 				D19F40351AC1088100EE3ACC /* Alamofire.framework in Frameworks */,
-				D19F40361AC1088200EE3ACC /* Runes.framework in Frameworks */,
-				D19F40371AC1088200EE3ACC /* Argo.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -129,6 +123,7 @@
 		D1AAE79D1AC0C09900461DEA /* Youtube */ = {
 			isa = PBXGroup;
 			children = (
+				D1BE25571ACF3FC600D91E39 /* Field.swift */,
 				D1AAE7FE1AC0C77A00461DEA /* youtube-gen.swift */,
 				D1AAE7A01AC0C09900461DEA /* Youtube.h */,
 				D1AAE79E1AC0C09900461DEA /* Supporting Files */,
@@ -148,6 +143,7 @@
 			isa = PBXGroup;
 			children = (
 				D1AAE7AD1AC0C09900461DEA /* YoutubeTests.swift */,
+				D1BE25551ACB718300D91E39 /* JSONTests.swift */,
 				D1AAE7AB1AC0C09900461DEA /* Supporting Files */,
 			);
 			path = YoutubeTests;
@@ -164,10 +160,8 @@
 		D1AAE7B71AC0C10000461DEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				D1AAE8081AC0D7FE00461DEA /* Box.framework */,
+				D1BE25531ACB6F4300D91E39 /* SwiftyJSON.framework */,
 				D1AAE8021AC0C7CD00461DEA /* Alamofire.framework */,
-				D1AAE8031AC0C7CD00461DEA /* Runes.framework */,
-				D1AAE8041AC0C7CD00461DEA /* Argo.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -420,10 +414,8 @@
 			files = (
 			);
 			inputPaths = (
-				"$(SRCROOT)/Carthage/Build/iOS/Box.framework",
-				"$(SRCROOT)/Carthage/Build/iOS/Alamofire.framework",
-				"$(SRCROOT)/Carthage/Build/iOS/Runes.framework",
-				"$(SRCROOT)/Carthage/Build/iOS/Argo.framework",
+				"$(SRCROOT)/../Carthage/Build/iOS/SwiftyJSON.framework",
+				"$(SRCROOT)/../Carthage/Build/iOS/Alamofire.framework",
 			);
 			outputPaths = (
 			);
@@ -438,6 +430,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D1BE255A1ACF40B500D91E39 /* Field.swift in Sources */,
 				D1AAE7FF1AC0C77A00461DEA /* youtube-gen.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -447,6 +440,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				D1AAE7AE1AC0C09900461DEA /* YoutubeTests.swift in Sources */,
+				D1BE25561ACB718300D91E39 /* JSONTests.swift in Sources */,
+				D1BE25581ACF3FC600D91E39 /* Field.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -454,6 +449,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D1BE25591ACF3FC600D91E39 /* Field.swift in Sources */,
 				D1AAE8011AC0C77A00461DEA /* youtube-gen.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

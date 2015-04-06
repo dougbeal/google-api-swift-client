@@ -2,16 +2,10 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:Carthage/Checkouts/runes/Runes.xcodeproj">
-   </FileRef>
-   <FileRef
-      location = "group:Carthage/Checkouts/Box/Box.xcodeproj">
+      location = "group:Carthage/Checkouts/SwiftyJSON/SwiftyJSON.xcodeproj">
    </FileRef>
    <FileRef
       location = "group:Carthage/Checkouts/Alamofire/Alamofire.xcodeproj">
-   </FileRef>
-   <FileRef
-      location = "group:Carthage/Checkouts/Argo/Argo.xcodeproj">
    </FileRef>
    <Group
       location = "container:"
@@ -20,6 +14,9 @@
          location = "group:Youtube/Youtube.xcodeproj">
       </FileRef>
    </Group>
+   <FileRef
+      location = "group:maptest.playground">
+   </FileRef>
    <FileRef
       location = "group:ClientYoutube.playground">
    </FileRef>
