@@ -422,8 +422,8 @@ func (a *API) GenerateCode() ([]byte, error) {
 
 	pn("import Foundation")
 	pn("import Alamofire")
-	pn("import Argo")
-	pn("import Runes")			
+	pn("import SwiftyJSON")
+
 	p("\n")
 	
 	//p("package %s\n", pkg)
@@ -463,7 +463,6 @@ func (a *API) GenerateCode() ([]byte, error) {
 	pn(swiftIndent + "static let apiName = %q", jstr(m, "name"))
 	pn(swiftIndent + "static let apiVersion = %q", jstr(m, "version"))
 	pn(swiftIndent + "static let basePath = %q", a.apiBaseURL())
-	pn(swiftIndent + "static let baseURL = NSURL(string: %s.basePath)!", pkg)
 	p("\n")
 	p("// MARK: scope constants\n")	
 	a.generateScopeConstants(swiftIndent)
@@ -483,19 +482,20 @@ func (a *API) GenerateCode() ([]byte, error) {
 	
 	p("//service\n")
 	a.GetName("Service") // ignore return value; no user-defined names yet
-	p("\nstruct Service {\n")
-	pn(swiftIndent + "init(client: Alamofire.Manager, BasePath: String) {")
+	p("\npublic class Service {\n")
+	pn(swiftIndent + "private init(client: Alamofire.Manager, BasePath: String) {")
 	pn("%sself.client = client", swiftIndent + swiftIndent)
 	pn("%sself.BasePath = BasePath", swiftIndent + swiftIndent)		
-	for _, res := range reslist {
-		pn("%sself.%s = %s(s: self)", swiftIndent + swiftIndent, res.GoField(), res.SwiftType())
-	}	
+	// for _, res := range reslist {
+	// 	pn("%sself.%s = %s(s: self)", swiftIndent + swiftIndent, res.GoField(), res.SwiftType())
+	// }	
 	pn(swiftIndent + "}")
 	p(swiftIndent + "let client: Alamofire.Manager\n")
 	p(swiftIndent + "let BasePath: String // API endpoint base URL\n")
 
 	for _, res := range reslist {
-		p("%slet %s: %s\n", swiftIndent, res.GoField(), res.SwiftType())
+		p("%slazy var %s: %s = { [unowned self] in ", swiftIndent, res.GoField(), res.SwiftType())
+		pn("return %s(client: self.client) }()", res.SwiftType())
 	}
 	pn("")
 
@@ -638,6 +638,10 @@ func (t *Type) asSimpleSwiftType() (goType string, ok bool) {
 	return simpleSwiftTypeConvert(t.apiType(), t.apiTypeFormat())
 }
 
+func (t *Type) asSimpleSwiftlyJSONType() (goType string, ok bool) {
+	return simpleSwiftlyJSONTypeConvert(t.apiType(), t.apiTypeFormat())
+}
+
 func (t *Type) String() string {
 	return fmt.Sprintf("[type=%q, map=%s]", t.apiType(), prettyJSON(t.m))
 }
@@ -725,7 +729,7 @@ func (t *Type) AsSwift() string {
 		}
 		return s.Type().AsSwift()
 	}
-	if typ, ok := t.MapType(); ok {
+	if typ, ok := t.SwiftMapType(); ok {
 		return typ
 	}
 	if t.IsStruct() {
@@ -739,7 +743,76 @@ func (t *Type) AsSwift() string {
 				return s.SwiftName()
 			}
 			// optional?
-			return s.SwiftName() + "?"
+			return s.SwiftName() //+ "?"
+		}
+		panic("in Type.AsSwift, no _apiName found for struct type " + prettyJSON(t.m))
+	}
+	panic("unhandled Type.AsSwift for " + prettyJSON(t.m))
+}
+
+func (t *Type) AsInitSwiftlyJSON() string {
+	if t, ok := t.asSimpleSwiftlyJSONType(); ok {
+		return `%s.` + t
+	}
+	if at, ok := t.ArrayType(); ok {
+		if at.apiType() == "string" {
+			if typ, ok := at.asSimpleSwiftlyJSONType(); ok {
+	
+				switch at.apiTypeFormat() {
+					// TODO: Convert  to swift
+				case "int64":
+					return "googleapi.Int64s"
+				case "uint64":
+					return "googleapi.Uint64s"
+				case "int32":
+					return "googleapi.Int32s"
+				case "uint32":
+					return "googleapi.Uint32s"
+				case "float64":
+					return "googleapi.Float64s"
+				default:
+					return `map( %s.arrayValue, { $0.`  + typ + " } )"
+				}
+			} else { 
+				return "ERROR"
+			}		
+		}
+		// reference array?
+		return `map( %s.arrayValue, { (json: JSON) -> ` + at.AsSwift() + " in " +  fmt.Sprintf( at.AsInitSwiftlyJSON(), "json") + " } )" 
+	}
+	if ref, ok := t.Reference(); ok {
+		s := t.api.schemas[ref]
+		if s == nil {
+			panic(fmt.Sprintf("in Type.AsSwift(), failed to find referenced type %q for %s",
+				ref, prettyJSON(t.m)))
+		}
+		return s.Type().AsSwift() + `.decode(%s)`
+	}
+	if typ, ok := t.SwiftMapType(); ok {
+		if keyType, valueType, ok  := t.MapTypes(); ok {
+			dictType := typ
+			return `reduce( ` +
+				`map( %s.dictionaryValue, ` +
+				fmt.Sprintf(`{ return ($0, %s.decode($1)) }),`, valueType.AsSwift()) +
+				fmt.Sprintf(`%s()`, dictType) +
+				fmt.Sprintf(`, { (var dict: %s, let pair: (k: %s, v: %s)) -> %s in dict[pair.k] = pair.v; return dict`, dictType,
+				keyType.AsSwift(), valueType.AsSwift(), dictType)  +
+				 " } )" 
+
+		}
+	}
+	if t.IsStruct() {
+		if apiName, ok := t.m["_apiName"].(string); ok {
+			s := t.api.schemas[apiName]
+			if s == nil {
+				panic(fmt.Sprintf("in Type.AsSwift, _apiName of %q didn't point to a valid schema; json: %s",
+					apiName, prettyJSON(t.m)))
+			}
+			if v := jobj(s.m, "variant"); v != nil {
+				return s.SwiftName()
+			}
+			// optional?
+			return s.Type().AsSwift() + `.decode(%s)`
 		}
 		panic("in Type.AsSwift, no _apiName found for struct type " + prettyJSON(t.m))
 	}
@@ -803,6 +876,95 @@ func (t *Type) MapType() (typ string, ok bool) {
 		return "", false
 	}
 	return "map[string][]string", true
+}
+
+func (t *Type) MapTypes() (keyType *Type, valueType *Type, ok bool) {
+	fmt.Printf("%s\n", prettyJSON(t.m))
+	props := jobj(t.m, "additionalProperties")
+	if props == nil {
+		return nil, nil, false
+	}
+	km := make(map[string] interface{})
+	km["type"] = "string"
+	keyType = &Type{ api: t.api, m: km }	
+	s := jstr(props, "type")
+	if s == "string" {
+
+		valueType = &Type{ api: t.api, m: km }
+		return keyType, valueType, true
+	}
+	if s != "array" {
+		if s == "" ||  s == "object" { // Check for reference
+			ref := jstr(props, "$ref")
+			if ref != "" {
+				vm := make(map[string] interface{})
+				vm["$ref"] = ref
+				valueType = &Type{ api: t.api, m: vm }				
+				return keyType, valueType, true				
+			}
+		}
+		log.Printf("Warning: found map to type %q which is not implemented yet.", s)
+		return nil, nil, false
+	}
+	items := jobj(props, "items")
+	if items == nil {
+		return nil, nil, false
+	}
+	s = jstr(items, "type")
+	if s != "string" {
+		if s == "" { // Check for reference
+			s = jstr(items, "$ref")
+			if s != "" {
+				vm := make(map[string] interface{})
+				vm["type"] = s
+				valueType = &Type{ api: t.api, m: km }				
+				return keyType, valueType, true								
+			}
+		}
+		log.Printf("Warning: found map of arrays of type %q which is not implemented yet.", s)
+		return nil, nil, false
+	}
+	valueType = &Type{ api: t.api, m: km }
+	return keyType, valueType, true	
+}
+
+// MapType checks if the current node is a map and if true, it returns the Go type for the map, such as map[string]string.
+func (t *Type) SwiftMapType() (typ string, ok bool) {
+	dictionaryTemplate := "[String: %s]"
+	props := jobj(t.m, "additionalProperties")
+	if props == nil {
+		return "", false
+	}
+	s := jstr(props, "type")
+	if s == "string" {
+		return fmt.Sprintf(dictionaryTemplate, "String"), true
+	}
+	if s != "array" {
+		if s == "" { // Check for reference
+			s = jstr(props, "$ref")
+			if s != "" {
+				return fmt.Sprintf(dictionaryTemplate, s), true
+			}
+		}
+		log.Printf("Warning: found map to type %q which is not implemented yet.", s)
+		return "", false
+	}
+	items := jobj(props, "items")
+	if items == nil {
+		return "", false
+	}
+	s = jstr(items, "type")
+	if s != "string" {
+		if s == "" { // Check for reference
+			s = jstr(items, "$ref")
+			if s != "" {
+				return "map[string][]" + s, true
+			}
+		}
+		log.Printf("Warning: found map of arrays of type %q which is not implemented yet.", s)
+		return "", false
+	}
+	return "SwiftMapType ERROR map[string][]string", true
 }
 
 func (t *Type) IsReference() bool {
@@ -966,7 +1128,7 @@ func (s *Schema) GoName() string {
 
 func (s *Schema) SwiftName() string {
 	if s.goName == "" {
-		if name, ok := s.Type().MapType(); ok {
+		if name, ok := s.Type().SwiftMapType(); ok {
 			s.goName = name
 		} else {
 			s.goName = s.api.GetName(initialCap(s.apiName))
@@ -1016,7 +1178,7 @@ func (s *Schema) writeSchemaCode(indent string, api *API) {
 
 	if destSchema, ok := s.Type().ReferenceSchema(); ok {
 		// Convert it to a struct using embedding.
-		s.api.p("\nstruct %s: JSONDecodable {\n // REFERENCE", s.SwiftName())
+		s.api.p("\nstruct %s {\n // REFERENCE", s.SwiftName())
 		s.api.p("\t%s\n", destSchema.SwiftName())
 		s.api.p("}\n")
 		return
@@ -1079,7 +1241,7 @@ func (s *Schema) writeSchemaStruct(indent string, api *API) {
 		return
 	}
 	// TODO: description
-	s.api.p("\nstruct %s: JSONDecodable {\n", s.GoName())
+	s.api.p("\nstruct %s {\n", s.GoName())
 	for i, p := range s.properties() {
 		if i > 0 {
 			s.api.p("\n")
@@ -1097,49 +1259,25 @@ func (s *Schema) writeSchemaStruct(indent string, api *API) {
 
 	}
 
-	// create function
-	s.api.p("\n" + indent + "static func create(")
-	for i, p := range s.properties() {
-		if i > 0 {
-			s.api.p(")(")
-		}
-		pname := validSwiftIdentifer(p.apiName)
-		ptype := p.Type().AsSwift()
-		s.api.p("%s: %s", pname, ptype)
-
-	}
-	s.api.p(") -> %s {\n", s.GoName())
-	s.api.p(indent + swiftIndent + "return %s(", s.GoName())
-	for i, p := range s.properties() {
-		if i > 0 {
-			s.api.p(", ")
-		}
-		pname := validSwiftIdentifer(p.apiName)
-		s.api.p("%s: %s", pname, pname)
-		
-	}
-	s.api.p(")\n")
-	s.api.pn(indent + "}")
 
 	// decode function
-	s.api.p("\n" + indent + "static func decode (j: JSON) -> Decoded<%s> {\n", s.GoName())
-	s.api.pn(indent + swiftIndent + "return %s.create",  s.GoName())
+	s.api.p("\n" + indent + "static func decode (json: JSON) -> %s {\n", s.GoName())
+	s.api.pn(indent + swiftIndent + "return %s(",  s.GoName())
 	for i, p := range s.properties() {
+		indent := indent + swiftIndent + swiftIndent
+		pname := validSwiftIdentifer(p.apiName)
+		jsonKey := p.apiName
 		if i > 0 {
-			s.api.p(indent + swiftIndent + swiftIndent + "<*> ")
-		} else {
-			s.api.p(indent + swiftIndent + swiftIndent + "<^> ")
+			s.api.p(",\n")
 		}
-		
-		pname := p.apiName
-		// TODO: Can't have all conditional types in structs
-		if _, ok := p.Type().ArrayType(); ok {	
-			s.api.pn(`j <|| "%s"`, pname)
-		} else {
-			s.api.pn(`j <| "%s"`, pname)			
-		}
+		json := fmt.Sprintf(`json["%s"]`, jsonKey)
+		template := indent + "%s: " + p.Type().AsInitSwiftlyJSON()
+		//fmt.Println("%s, %s, %s", template, pname, json)
+		s.api.p(template, pname, json)
 
 	}
+	s.api.pn("")
+	s.api.pn(indent + swiftIndent + ")")	
 	s.api.pn(indent + "}")
 	s.api.p("}\n")
 }
@@ -1193,8 +1331,9 @@ func (r *Resource) generateType() {
 	t := r.SwiftType()
 	var indent = swiftIndent
 	pn(fmt.Sprintf("struct %s {", t))
-	pn(indent + "let s: Service")
-	pn(indent + "var rs: %s { get { return self } }", t)		
+	pn(indent + "let client: Alamofire.Manager")
+	//pn(indent + "let s: Service")
+	//pn(indent + "var rs: %s { get { return self } }", t)		
 	//pn(indent + "rs := &%s{s : s}", t)
 	//TODO: what uses this?
 	for _, res := range r.resources {
@@ -1353,11 +1492,12 @@ func (meth *Method) generateCode() {
 	callName := a.GetName(prefix + initialCap(methodName) + "Call")
 	pn("// // ...Call struct")
 	p("\nstruct %s {\n", callName)
-	p(swiftIndent + "let s: Service\n")
+	p(swiftIndent + "let client: Alamofire.Manager\n")
+	p(swiftIndent + "var opt_: [String: String]\n")	
 	for _, arg := range args.l {
 		p(swiftIndent + "var %s: %s\n", arg.goname, arg.gotype)
 	}
-	p(swiftIndent + "var opt_: [String: String]\n")
+
 	if meth.supportsMediaUpload() {
 		pn("/* TODO: upload support")
 		p("\tmedia_     io.Reader\n")
@@ -1380,19 +1520,22 @@ func (meth *Method) generateCode() {
 	pn("// // ...Service extension")
 	if res == nil {
 		p("extension %s {\n", "Service") 
-		p(swiftIndent + "func %s(%s) -> %s {\n", methodName, args, callName)
-		servicePtr = "s"				
+
 
 	} else {
 		p("extension %s {\n", res.SwiftType())
-		p(swiftIndent + "func %s(%s) -> %s {\n", methodName, args, callName)
-		servicePtr = "s"
 	}
+	p(swiftIndent + "func %s(%s) -> %s {\n", methodName, args, callName)
+	servicePtr = "client"					
+
 	var indent = swiftIndent + swiftIndent 
-	p(indent + "c = %s(s: %s, opt_: Dictionary<String, String>())\n", callName, servicePtr)
+	p(indent + "var c = %s(\n", callName)
+	pn(indent + swiftIndent + "client: %s,", servicePtr)
+	p(indent + swiftIndent + "opt_: Dictionary<String, String>()")
 	for _, arg := range args.l {
-		p(indent + "c.%s = %s\n", arg.goname, arg.goname)
+		p(",\n" + indent + swiftIndent + "%s: %s", arg.goname, arg.goname)
 	}
+	pn("\n" + indent + swiftIndent + ")")
 	p(indent + "return c\n")
 	p(swiftIndent + "}\n")
 	pn("}")	
@@ -1402,7 +1545,7 @@ func (meth *Method) generateCode() {
 	pn("extension %s {", callName)
 
 
-	servicePtr = "s"	
+	servicePtr = "client"	
 	for _, opt := range meth.OptParams() {
 		setter := opt.name
 		des := jstr(opt.m, "description")
@@ -1412,9 +1555,9 @@ func (meth *Method) generateCode() {
 		np := new(namePool)
 		np.Get("c") // take the receiver's name
 		paramName := np.Get(validSwiftIdentifer(opt.name))
-		p(swiftIndent + "func %s(%s: %s) -> %s {\n", setter, paramName, opt.SwiftType(), callName)
-		p(indent + "c.opt_[%q] = %s\n", opt.name, paramName)
-		p(indent + "return c\n")
+		p(swiftIndent + "mutating func %s(%s: %s) -> %s {\n", setter, paramName, opt.SwiftType(), callName)
+		pn(indent + `self.opt_[%q] = "\(%s)"`, opt.name, paramName)
+		p(indent + "return self\n")
 		p(swiftIndent + "}\n")
 	}
 
@@ -1452,13 +1595,12 @@ func (meth *Method) generateCode() {
 	pn("\n" + swiftIndent + "// Fields allows partial responses to be retrieved.")
 	pn(swiftIndent + "// See https://developers.google.com/gdata/docs/2.0/basics#PartialResponse")
 	pn(swiftIndent + "// for more information.")
-	pn(swiftIndent + "func fields(s: googleapi.Field...) -> %s {", callName)
-	// TODO: convert googleapi.CompileFields?
-	pn(indent + `c.opt_["fields"] = googleapi.CombineFields(s)`)
-	pn(indent + "return c")
+	pn(swiftIndent + "mutating func fields(fields: Field...) -> %s {", callName)
+	pn(indent + `self.opt_["fields"] = CombineFields(fields)`)
+	pn(indent + "return self")
 	pn(swiftIndent + "}")
 
-	pn("\n" + swiftIndent + "func Do(block: (%serror) -> () ) {", retTypeComma)
+	pn("\n" + swiftIndent + "func Do(block: (%serror: NSError?) -> () ) {", retTypeComma)
 
 	// TODO: convert to swift"
 	/*
@@ -1467,20 +1609,11 @@ func (meth *Method) generateCode() {
 		nilRet = "nil, "
 	}
 */
-/*
-let json: AnyObject? = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions(0), error: .None)
 
-if let j: AnyObject = json {
-  let value = JSONValue.parse(j)
-  let user = User.decode(value)
-}
-*/
-	pn(indent + `let basePath = c.s.BasePath`)
+	pn(indent + `let basePath = %s.basePath`, meth.api.Package())
 	pn(indent + `let path = "%s"`, jstr(meth.m, "path"))
-	pn(indent + `let baseURL = NSURL(string: basePath)!`)
-	pn(indent + `let url = NSURLComponents(URL: basePath, resolvedAgainstBaseURL: true)`)
-	pn(indent + "var manager = Alamofire.Manager.sharedInstance")
-	pn(indent + "var headers = manager.session.configuration.HTTPAdditionalHeaders ?? Dictionary<String, String>()")
+	pn(indent + `let url = NSURL(string: basePath + path)!`)
+	pn(indent + "var headers = client.session.configuration.HTTPAdditionalHeaders ?? Dictionary<String, String>()")
 	
 	//pn(indent + "var body io.Reader = nil")
 	hasContentType := false
@@ -1493,8 +1626,9 @@ if let j: AnyObject = json {
 		}
 */
 		pn(indent + "// TODO: convert body to JSON")
+		pn(indent + `let body = ""`)
 		/*
-		pn(indent + "body, err := googleapi.%s.JSONReader(c.%s)", style, ba.goname)
+		pn(indent + "body, err := googleapi.%s.JSONReader(self.%s)", style, ba.goname)
 		pn(indent + "if err != nil { return %serr }", nilRet)*/
 		pn(indent + `let ctype = "application/json"`)
 
@@ -1503,40 +1637,40 @@ if let j: AnyObject = json {
 	pn(indent + "var params = Dictionary<String, String>()")
 	// Set this first. if they override it, though, might be gross.  We don't expect
 	// XML replies elsewhere.  TODO(bradfitz): hide this option in the generated code?
-	pn(indent + `params["alt"] = ["json"]`)
+	pn(indent + `params["alt"] = "json"`)
 	for _, p := range meth.RequiredQueryParams() {
-		pn(indent + `params[%q] = "\(c.%s)"`, p.name, p.goCallFieldName())
+		pn(indent + `params[%q] = "\(self.%s)"`, p.name, p.goCallFieldName())
 	}
 	// TODO: where is this used?
 	for _, p := range meth.RequiredRepeatedQueryParams() {
-		pn(indent + `for _, v in c.%s { params[%q] = "\(v)" }`,
+		pn(indent + `for _, v in self.%s { params[%q] = "\(v)" }`,
 			p.name, p.name)
 	}
 	opts := meth.OptParams()
 	opts = append(opts, &Param{name: "fields"})
 	for _, p := range opts {
 		// TODO: fix this if support xcode 6.2
-		pn(indent + `if v = c.opt_[%q] { params[%q] = "\(v)" }`,
+		pn(indent + `if let v = self.opt_[%q] { params[%q] = "\(v)" }`,
 			p.name, p.name)
 	}
 
-	//p(indent + "urls := googleapi.ResolveRelative(c.s.BasePath, %q)\n", jstr(meth.m, "path"))
+	//p(indent + "urls := googleapi.ResolveRelative(self.s.BasePath, %q)\n", jstr(meth.m, "path"))
 	// TODO: convert to swift
 	if meth.supportsMediaUpload() {
 		pn( indent + "// TODO: Swift Media upload goes here" )
 		/*
 		pn( indent + "var progressUpdater_ googleapi.ProgressUpdater")
-		pn( indent + "if v, ok := c.opt_[\"progressUpdater\"]; ok {")
+		pn( indent + "if v, ok := self.opt_[\"progressUpdater\"]; ok {")
 		pn( indent + " if pu, ok := v.(googleapi.ProgressUpdater); ok {")
 		pn( indent + "  progressUpdater_ = pu")
 		pn( indent + " }")
 		pn( indent + "}")
-		pn( indent + "if c.media_ != nil || c.resumable_ != nil {")
+		pn( indent + "if self.media_ != nil || self.resumable_ != nil {")
 		// Hack guess, since we get a 404 otherwise:
 		//pn("urls = googleapi.ResolveRelative(%q, %q)", a.apiBaseURL(), meth.mediaUploadPath())
 		// Further hack.  Discovery doc is wrong?
 		pn( indent + "urls = strings.Replace(urls, %q, %q, 1)", "https://www.googleapis.com/", "https://www.googleapis.com/upload/")
-		pn(indent + `params.Set("uploadType", c.protocol_)`)
+		pn(indent + `params.Set("uploadType", self.protocol_)`)
 		pn( indent + "}")
 */
 	}
@@ -1548,9 +1682,9 @@ if let j: AnyObject = json {
 			pn(`ctype := "application/json"`)
 			hasContentType = true
 		}
-		pn(indent + `if c.protocol_ != "resumable" {`)
+		pn(indent + `if self.protocol_ != "resumable" {`)
 		pn(indent + `  var cancel func()`)
-		pn( indent + "  cancel, _ = googleapi.ConditionallyIncludeMedia(c.media_, &body, &ctype)")
+		pn( indent + "  cancel, _ = googleapi.ConditionallyIncludeMedia(self.media_, &body, &ctype)")
 		pn( indent + "  if cancel != nil { defer cancel() }")
 		pn( indent + "}")
 */
@@ -1565,7 +1699,7 @@ if let j: AnyObject = json {
 	if len(argsForLocation) > 0 {
 		pn(indent + `googleapi.Expand(req.URL, map[string]string{`)
 		for _, arg := range argsForLocation {
-			pn(indent + `"%s": %s,`, arg.apiname, arg.exprAsString("c."))
+			pn(indent + `"%s": %s,`, arg.apiname, arg.exprAsString("self."))
 		}
 		pn(`})`)
 	} else {
@@ -1593,11 +1727,19 @@ if let j: AnyObject = json {
 	}
 
 	pn(indent + `headers["User-Agent"] = "google-api-swift-client/` + goGenVersion + `"`)
-	//pn(indent + "manager.session.configuration.HTTPAdditionalHeaders = headers")
-	pn(indent + "var req = manager.request(.%s, url, body, parameters: params)", httpMethod)	
-	pn(indent + "c.s.client.Do(req) { (request, response, json, error) in")
-	pn(indent + swiftIndent + "block(%s.decode(json), error)", responseType(a, meth.m))
-	pn(indent + "}")
+	//pn(indent + "client.session.configuration.HTTPAdditionalHeaders = headers")
+	pn(indent + "var request = client.request(Alamofire.Method.%s, url, parameters: params)", httpMethod)	
+	pn(indent + "request.responseJSON( completionHandler: { (request, response, json, error) in ")
+	decode := ""
+	if retTypeComma != "" {
+		decode = responseType(a, meth.m) +  ".decode(json), "
+	}
+	pn(indent + swiftIndent + "if let json = json as? JSON {")
+	pn(indent + swiftIndent + swiftIndent + "block(%serror: error)", decode)
+	pn(indent + swiftIndent + "} else {")
+	pn(indent + swiftIndent + swiftIndent + "// error handling")
+	pn(indent + swiftIndent + "}")	
+	pn(indent + "})")
 	//pn(indent + "if err != nil { return %serr }", nilRet)
 	//pn(indent + "defer googleapi.CloseBody(res)")
 	//pn(indent + "if err := googleapi.CheckResponse(res); err != nil { return %serr }", nilRet)
@@ -1666,6 +1808,18 @@ func (p *Param) SwiftType() string {
 		panic("unexpected int parameter encoded as string, not in query: " + p.name)
 	}
 	t, ok := simpleSwiftTypeConvert(typ, format)
+	if !ok {
+		panic("failed to convert parameter type " + fmt.Sprintf("type=%q, format=%q", typ, format))
+	}
+	return t
+}
+
+func (p *Param) SwiftlyJSONType() string {
+	typ, format := jstr(p.m, "type"), jstr(p.m, "format")
+	if typ == "string" && strings.Contains(format, "int") && p.Location() != "query" {
+		panic("unexpected int parameter encoded as string, not in query: " + p.name)
+	}
+	t, ok := simpleSwiftlyJSONTypeConvert(typ, format)
 	if !ok {
 		panic("failed to convert parameter type " + fmt.Sprintf("type=%q, format=%q", typ, format))
 	}
@@ -1920,6 +2074,33 @@ func simpleSwiftTypeConvert(apiType, format string) (swifttype string, ok bool) 
 		swifttype = "Double"
 	case "integer":
 		swifttype = "Int64"
+	case "any":
+		swifttype = "AnyObject"
+	}
+	return swifttype, swifttype != ""
+}
+
+func simpleSwiftlyJSONTypeConvert(apiType, format string) (swifttype string, ok bool) {
+	// From http://tools.ietf.org/html/draft-zyp-json-schema-03#section-5.1
+	switch apiType {
+	case "boolean":
+		swifttype = "boolValue"
+	case "string":
+		swifttype = "stringValue"
+		switch format {
+		case "int64":
+			swifttype = "int64Value"
+		case "uint64":
+			swifttype = "uInt64Value"
+		case "int32":
+			swifttype = "int32Value"			
+		case "uint32":
+			swifttype = "uInt32Value"
+		}
+	case "number":
+		swifttype = "doubleValue"
+	case "integer":
+		swifttype = "int64Value"
 	case "any":
 		swifttype = "AnyObject"
 	}
