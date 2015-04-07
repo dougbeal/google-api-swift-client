@@ -638,9 +638,6 @@ func (t *Type) asSimpleSwiftType() (goType string, ok bool) {
 	return simpleSwiftTypeConvert(t.apiType(), t.apiTypeFormat())
 }
 
-func (t *Type) asSimpleSwiftlyJSONType() (goType string, ok bool) {
-	return simpleSwiftlyJSONTypeConvert(t.apiType(), t.apiTypeFormat())
-}
 
 func (t *Type) String() string {
 	return fmt.Sprintf("[type=%q, map=%s]", t.apiType(), prettyJSON(t.m))
