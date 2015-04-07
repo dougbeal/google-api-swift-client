@@ -30,6 +30,13 @@
 			remoteGlobalIDString = D1AAE79A1AC0C09900461DEA;
 			remoteInfo = Youtube;
 		};
+		D1B3C2BC1AD48448006FD367 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D1AAE7921AC0C09900461DEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D1B3C2B81AD4821F006FD367;
+			remoteInfo = "Youtube-go";
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
@@ -288,6 +295,23 @@
 		};
 /* End PBXHeadersBuildPhase section */
 
+/* Begin PBXLegacyTarget section */
+		D1B3C2B81AD4821F006FD367 /* Youtube-go */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "-c \". ~/.profile; echo $(GOPATH); make $(PRODUCT_NAME)\"";
+			buildConfigurationList = D1B3C2BB1AD4821F006FD367 /* Build configuration list for PBXLegacyTarget "Youtube-go" */;
+			buildPhases = (
+			);
+			buildToolPath = bash;
+			buildWorkingDirectory = "$(SRCROOT)/..";
+			dependencies = (
+			);
+			name = "Youtube-go";
+			passBuildSettingsInEnvironment = 1;
+			productName = "Youtube-go";
+		};
+/* End PBXLegacyTarget section */
+
 /* Begin PBXNativeTarget section */
 		D1AAE79A1AC0C09900461DEA /* Youtube-iOS */ = {
 			isa = PBXNativeTarget;
@@ -302,6 +326,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				D1B3C2BD1AD48448006FD367 /* PBXTargetDependency */,
 			);
 			name = "Youtube-iOS";
 			productName = Youtube;
@@ -362,6 +387,9 @@
 					D1AAE7E41AC0C3B200461DEA = {
 						CreatedOnToolsVersion = 6.3;
 					};
+					D1B3C2B81AD4821F006FD367 = {
+						CreatedOnToolsVersion = 6.3;
+					};
 				};
 			};
 			buildConfigurationList = D1AAE7951AC0C09900461DEA /* Build configuration list for PBXProject "Youtube" */;
@@ -379,6 +407,7 @@
 				D1AAE79A1AC0C09900461DEA /* Youtube-iOS */,
 				D1AAE7A51AC0C09900461DEA /* YoutubeTests */,
 				D1AAE7E41AC0C3B200461DEA /* Youtube-mac */,
+				D1B3C2B81AD4821F006FD367 /* Youtube-go */,
 			);
 		};
 /* End PBXProject section */
@@ -461,6 +490,11 @@
 			isa = PBXTargetDependency;
 			target = D1AAE79A1AC0C09900461DEA /* Youtube-iOS */;
 			targetProxy = D1AAE7A81AC0C09900461DEA /* PBXContainerItemProxy */;
+		};
+		D1B3C2BD1AD48448006FD367 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D1B3C2B81AD4821F006FD367 /* Youtube-go */;
+			targetProxy = D1B3C2BC1AD48448006FD367 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -628,6 +662,24 @@
 			};
 			name = Release;
 		};
+		D1B3C2B91AD4821F006FD367 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GOPATH = "$(SRCROOT)/../build/go";
+				PRODUCT_NAME = youtube;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		D1B3C2BA1AD4821F006FD367 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GOPATH = "$(SRCROOT)/../build/go";
+				PRODUCT_NAME = youtube;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -666,6 +718,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		D1B3C2BB1AD4821F006FD367 /* Build configuration list for PBXLegacyTarget "Youtube-go" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D1B3C2B91AD4821F006FD367 /* Debug */,
+				D1B3C2BA1AD4821F006FD367 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 /* End XCConfigurationList section */
 	};

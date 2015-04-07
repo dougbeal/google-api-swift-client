@@ -11,7 +11,7 @@
       location = "container:"
       name = "clients">
       <FileRef
-         location = "group:Youtube/Youtube.xcodeproj">
+         location = "container:Youtube/Youtube.xcodeproj">
       </FileRef>
    </Group>
    <FileRef
