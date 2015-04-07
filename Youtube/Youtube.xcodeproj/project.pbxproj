@@ -37,6 +37,20 @@
 			remoteGlobalIDString = D1B3C2B81AD4821F006FD367;
 			remoteInfo = "Youtube-go";
 		};
+		D1B3C2BE1AD49166006FD367 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D1AAE7921AC0C09900461DEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D1B3C2B81AD4821F006FD367;
+			remoteInfo = "Youtube-go";
+		};
+		D1B3C2C01AD4917A006FD367 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D1AAE7921AC0C09900461DEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D1B3C2B81AD4821F006FD367;
+			remoteInfo = "Youtube-go";
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
@@ -298,7 +312,7 @@
 /* Begin PBXLegacyTarget section */
 		D1B3C2B81AD4821F006FD367 /* Youtube-go */ = {
 			isa = PBXLegacyTarget;
-			buildArgumentsString = "-c \". ~/.profile; echo $(GOPATH); make $(PRODUCT_NAME)\"";
+			buildArgumentsString = "-c \". ~/.profile; ./create-go-dirs.sh; make $(PRODUCT_NAME)\"";
 			buildConfigurationList = D1B3C2BB1AD4821F006FD367 /* Build configuration list for PBXLegacyTarget "Youtube-go" */;
 			buildPhases = (
 			);
@@ -344,6 +358,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				D1B3C2C11AD4917A006FD367 /* PBXTargetDependency */,
 				D1AAE7A91AC0C09900461DEA /* PBXTargetDependency */,
 			);
 			name = YoutubeTests;
@@ -363,6 +378,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				D1B3C2BF1AD49166006FD367 /* PBXTargetDependency */,
 			);
 			name = "Youtube-mac";
 			productName = "Youtube-mac";
@@ -495,6 +511,16 @@
 			isa = PBXTargetDependency;
 			target = D1B3C2B81AD4821F006FD367 /* Youtube-go */;
 			targetProxy = D1B3C2BC1AD48448006FD367 /* PBXContainerItemProxy */;
+		};
+		D1B3C2BF1AD49166006FD367 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D1B3C2B81AD4821F006FD367 /* Youtube-go */;
+			targetProxy = D1B3C2BE1AD49166006FD367 /* PBXContainerItemProxy */;
+		};
+		D1B3C2C11AD4917A006FD367 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D1B3C2B81AD4821F006FD367 /* Youtube-go */;
+			targetProxy = D1B3C2C01AD4917A006FD367 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -726,6 +752,7 @@
 				D1B3C2BA1AD4821F006FD367 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
