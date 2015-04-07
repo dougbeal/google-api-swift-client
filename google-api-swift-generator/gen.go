@@ -879,7 +879,6 @@ func (t *Type) MapType() (typ string, ok bool) {
 }
 
 func (t *Type) MapTypes() (keyType *Type, valueType *Type, ok bool) {
-	fmt.Printf("%s\n", prettyJSON(t.m))
 	props := jobj(t.m, "additionalProperties")
 	if props == nil {
 		return nil, nil, false
