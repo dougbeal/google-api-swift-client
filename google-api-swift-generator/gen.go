@@ -459,16 +459,16 @@ func (a *API) GenerateCode() ([]byte, error) {
 	// pn("var _ = strings.Replace")
 	// pn("var _ = context.Background")
 	// pn("")
-	pn(swiftIndent + "static let apiId = %q", jstr(m, "id"))
-	pn(swiftIndent + "static let apiName = %q", jstr(m, "name"))
-	pn(swiftIndent + "static let apiVersion = %q", jstr(m, "version"))
-	pn(swiftIndent + "static let basePath = %q", a.apiBaseURL())
+	pn(swiftIndent + "public static let apiId = %q", jstr(m, "id"))
+	pn(swiftIndent + "public static let apiName = %q", jstr(m, "name"))
+	pn(swiftIndent + "public static let apiVersion = %q", jstr(m, "version"))
+	pn(swiftIndent + "public static let basePath = %q", a.apiBaseURL())
 	p("\n")
 	p("// MARK: scope constants\n")	
 	a.generateScopeConstants(swiftIndent)
 	p("\n")
 	a.GetName("New") // ignore return value; we're the first caller	
-	pn(swiftIndent + "static func New(client: Alamofire.Manager) -> Service {")
+	pn(swiftIndent + "public static func New(client: Alamofire.Manager) -> Service {")
 	pn(indent + "return Service( client: client, BasePath: %s.basePath)", pkg)
 	/* trying out lazy
 	for _, res := range reslist { // add top level resources.
@@ -494,7 +494,7 @@ func (a *API) GenerateCode() ([]byte, error) {
 	p(swiftIndent + "let BasePath: String // API endpoint base URL\n")
 
 	for _, res := range reslist {
-		p("%slazy var %s: %s = { [unowned self] in ", swiftIndent, res.GoField(), res.SwiftType())
+		p("%spublic lazy var %s: %s = { [unowned self] in ", swiftIndent, res.GoField(), res.SwiftType())
 		pn("return %s(client: self.client) }()", res.SwiftType())
 	}
 	pn("")
@@ -537,7 +537,7 @@ func (a *API) generateScopeConstants(indent string) {
 	}
 
 	a.p(indent + "// OAuth2 scopes used by this API.\n")
-	a.p(indent + "struct scope {\n")
+	a.p(indent + "public struct scope {\n")
 	n := 0
 	for _, scopeName := range sortedKeys(scopes) {
 		mi := scopes[scopeName]
@@ -549,7 +549,7 @@ func (a *API) generateScopeConstants(indent string) {
 		if des := jstr(mi.(map[string]interface{}), "description"); des != "" {
 			a.p("%s", asComment(indent + swiftIndent, des))
 		}
-		a.p(indent + swiftIndent + "static let %s = %q\n", ident, scopeName)
+		a.p(indent + swiftIndent + "public static let %s = %q\n", ident, scopeName)
 	}
 	a.p(indent + "}\n\n")
 }
@@ -1240,7 +1240,8 @@ func (s *Schema) writeSchemaStruct(indent string, api *API) {
 		return
 	}
 	// TODO: description
-	s.api.p("\nstruct %s {\n", s.GoName())
+	s.api.pn("")
+	s.api.p("public struct %s {\n", s.GoName())
 	for i, p := range s.properties() {
 		if i > 0 {
 			s.api.p("\n")
@@ -1253,14 +1254,14 @@ func (s *Schema) writeSchemaStruct(indent string, api *API) {
 		if p.Type().isIntAsString() {
 			extraOpt += ",string"
 		}
-		s.api.p(indent + "let %s: %s //  json:\"%s,omitempty%s\" \n", pname, p.Type().AsSwift(),
+		s.api.p(indent + "public let %s: %s //  json:\"%s,omitempty%s\" \n", pname, p.Type().AsSwift(),
 			p.APIName(), extraOpt)
 
 	}
 
 
 	// decode function
-	s.api.p("\n" + indent + "static func decode (json: JSON) -> %s {\n", s.GoName())
+	s.api.p("\n" + indent + "public static func decode (json: JSON) -> %s {\n", s.GoName())
 	s.api.pn(indent + swiftIndent + "return %s(",  s.GoName())
 	for i, p := range s.properties() {
 		indent := indent + swiftIndent + swiftIndent
@@ -1329,7 +1330,7 @@ func (r *Resource) generateType() {
 	p, pn := r.api.p, r.api.pn
 	t := r.SwiftType()
 	var indent = swiftIndent
-	pn(fmt.Sprintf("struct %s {", t))
+	pn(fmt.Sprintf("public struct %s {", t))
 	pn(indent + "let client: Alamofire.Manager")
 	//pn(indent + "let s: Service")
 	//pn(indent + "var rs: %s { get { return self } }", t)		
@@ -1490,7 +1491,7 @@ func (meth *Method) generateCode() {
 	}
 	callName := a.GetName(prefix + initialCap(methodName) + "Call")
 	pn("// // ...Call struct")
-	p("\nstruct %s {\n", callName)
+	p("\npublic struct %s {\n", callName)
 	p(swiftIndent + "let client: Alamofire.Manager\n")
 	p(swiftIndent + "var opt_: [String: String]\n")	
 	for _, arg := range args.l {
@@ -1524,7 +1525,7 @@ func (meth *Method) generateCode() {
 	} else {
 		p("extension %s {\n", res.SwiftType())
 	}
-	p(swiftIndent + "func %s(%s) -> %s {\n", methodName, args, callName)
+	p(swiftIndent + "public func %s(%s) -> %s {\n", methodName, args, callName)
 	servicePtr = "client"					
 
 	var indent = swiftIndent + swiftIndent 
@@ -1554,7 +1555,7 @@ func (meth *Method) generateCode() {
 		np := new(namePool)
 		np.Get("c") // take the receiver's name
 		paramName := np.Get(validSwiftIdentifer(opt.name))
-		p(swiftIndent + "mutating func %s(%s: %s) -> %s {\n", setter, paramName, opt.SwiftType(), callName)
+		p(swiftIndent + "public mutating func %s(%s: %s) -> %s {\n", setter, paramName, opt.SwiftType(), callName)
 		pn(indent + `self.opt_[%q] = "\(%s)"`, opt.name, paramName)
 		p(indent + "return self\n")
 		p(swiftIndent + "}\n")
@@ -1594,12 +1595,12 @@ func (meth *Method) generateCode() {
 	pn("\n" + swiftIndent + "// Fields allows partial responses to be retrieved.")
 	pn(swiftIndent + "// See https://developers.google.com/gdata/docs/2.0/basics#PartialResponse")
 	pn(swiftIndent + "// for more information.")
-	pn(swiftIndent + "mutating func fields(fields: Field...) -> %s {", callName)
+	pn(swiftIndent + "public mutating func fields(fields: Field...) -> %s {", callName)
 	pn(indent + `self.opt_["fields"] = CombineFields(fields)`)
 	pn(indent + "return self")
 	pn(swiftIndent + "}")
 
-	pn("\n" + swiftIndent + "func Do(block: (%serror: NSError?) -> () ) {", retTypeComma)
+	pn("\n" + swiftIndent + "public func Do(block: (%serror: NSError?) -> () ) {", retTypeComma)
 
 	// TODO: convert to swift"
 	/*
