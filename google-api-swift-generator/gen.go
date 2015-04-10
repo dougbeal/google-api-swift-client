@@ -376,7 +376,7 @@ func (a *API) WriteGeneratedCode() error {
 var docsLink string
 
 func (a *API) GenerateCode() ([]byte, error) {
-	var indent = swiftIndent + swiftIndent 
+	level := ""
 	pkg := a.Package()
 
 	a.m = make(map[string]interface{})
@@ -426,72 +426,39 @@ func (a *API) GenerateCode() ([]byte, error) {
 
 	p("\n")
 	
-	//p("package %s\n", pkg)
-	p("public struct %s {\n", pkg)
-
-	// p("import (\n")
-	// for _, pkg := range []string{
-	// 	"bytes",
-	// 	*googleAPIPkg,
-	// 	"encoding/json",
-	// 	"errors",
-	// 	"fmt",
-	// 	"io",
-	// 	"net/http",
-	// 	"net/url",
-	// 	"strconv",
-	// 	"strings",
-	// 	*contextPkg,
-	// } {
-	// 	p("\t%q\n", pkg)
-	// }
-	// p(")\n\n")
-	// pn("// Always reference these packages, just in case the auto-generated code")
-	// pn("// below doesn't.")
-	// pn("var _ = bytes.NewBuffer")
-	// pn("var _ = strconv.Itoa")
-	// pn("var _ = fmt.Sprintf")
-	// pn("var _ = json.NewDecoder")
-	// pn("var _ = io.Copy")
-	// pn("var _ = url.Parse")
-	// pn("var _ = googleapi.Version")
-	// pn("var _ = errors.New")
-	// pn("var _ = strings.Replace")
-	// pn("var _ = context.Background")
-	// pn("")
-	pn(swiftIndent + "public static let apiId = %q", jstr(m, "id"))
-	pn(swiftIndent + "public static let apiName = %q", jstr(m, "name"))
-	pn(swiftIndent + "public static let apiVersion = %q", jstr(m, "version"))
-	pn(swiftIndent + "public static let basePath = %q", a.apiBaseURL())
+	//p("public struct %s {\n", pkg)
+	level = ""
+	pn(level + "public let id = %q", jstr(m, "id"))
+	pn(level + "public let name = %q", jstr(m, "name"))
+	pn(level + "public let version = %q", jstr(m, "version"))
+	pn(level + "public let basePath = %q", a.apiBaseURL())
 	p("\n")
 	p("// MARK: scope constants\n")	
-	a.generateScopeConstants(swiftIndent)
+	a.generateScopeConstants(level)
 	p("\n")
+
 	a.GetName("New") // ignore return value; we're the first caller	
-	pn(swiftIndent + "public static func New(client: Alamofire.Manager) -> Service {")
-	pn(indent + "return Service( client: client, BasePath: %s.basePath)", pkg)
-	/* trying out lazy
-	for _, res := range reslist { // add top level resources.
-		pn(indent + "%s = %s(s)", res.GoField(), res.SwiftType())
-	}
-*/
-	//pn(indent + "return s, nil")
-	pn(swiftIndent + "}")		
+	pn(level + "public func New(client: Alamofire.Manager) -> Service {")
+	level = swiftIndent
+	pn(level + "return Service( client: client, BasePath: basePath)")
 	p("}\n")	
 
 	
 	p("//service\n")
 	a.GetName("Service") // ignore return value; no user-defined names yet
 	p("\npublic class Service {\n")
-	pn(swiftIndent + "private init(client: Alamofire.Manager, BasePath: String) {")
-	pn("%sself.client = client", swiftIndent + swiftIndent)
-	pn("%sself.BasePath = BasePath", swiftIndent + swiftIndent)		
+	level = swiftIndent
+	pn(level + "private init(client: Alamofire.Manager, BasePath: String) {")
+	level = swiftIndent + swiftIndent
+	pn("%sself.client = client", level)
+	pn("%sself.BasePath = BasePath", level)		
 	// for _, res := range reslist {
 	// 	pn("%sself.%s = %s(s: self)", swiftIndent + swiftIndent, res.GoField(), res.SwiftType())
-	// }	
-	pn(swiftIndent + "}")
-	p(swiftIndent + "let client: Alamofire.Manager\n")
-	p(swiftIndent + "let BasePath: String // API endpoint base URL\n")
+	// }
+	level = swiftIndent	
+	pn(level + "}")
+	p(level + "let client: Alamofire.Manager\n")
+	p(level + "let BasePath: String // API endpoint base URL\n")
 
 	for _, res := range reslist {
 		p("%spublic lazy var %s: %s = { [unowned self] in ", swiftIndent, res.GoField(), res.SwiftType())
@@ -1610,7 +1577,7 @@ func (meth *Method) generateCode() {
 	}
 */
 
-	pn(indent + `let basePath = %s.basePath`, meth.api.Package())
+	//pn(indent + `let basePath = %s.basePath`, meth.api.Package())
 	pn(indent + `let path = "%s"`, jstr(meth.m, "path"))
 	pn(indent + `let url = NSURL(string: basePath + path)!`)
 	pn(indent + "var headers = client.session.configuration.HTTPAdditionalHeaders ?? Dictionary<String, String>()")
