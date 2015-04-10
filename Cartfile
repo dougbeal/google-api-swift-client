@@ -1,2 +1,2 @@
-github "SwiftyJSON/SwiftyJSON" "xcode6.3"
-github "Alamofire/Alamofire" "xcode-6.3"
+github "dougbeal/SwiftyJSON" "master"
+github "Alamofire/Alamofire" ~> 1.2
