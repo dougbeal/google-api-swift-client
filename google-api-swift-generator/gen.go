@@ -26,6 +26,8 @@ import (
 // goGenVersion is the version of the Go code generator
 const goGenVersion = "0.5"
 const swiftIndent = "    "
+var serviceFilter = [...]string{ "[pP]laylist.*", "[tT]humbnail.*", "[rR]esourceId.*", "[pP]ageInfo.*", "[tT]okenPagination.*"}
+
 
 var (
 	apiToGenerate = flag.String("api", "*", "The API ID to generate, like 'tasks:v1'. A value of '*' means all.")
@@ -408,6 +410,7 @@ func (a *API) GenerateCode() ([]byte, error) {
 	p, pn := a.p, a.pn
 	reslist := a.Resources(a.m, "")
 
+
 	p("// Package %s provides access to the %s.\n", pkg, jstr(m, "title"))
 	docsLink = jstr(m, "documentationLink")
 	if docsLink != "" {
@@ -425,7 +428,15 @@ func (a *API) GenerateCode() ([]byte, error) {
 	pn("import Argo")
 	pn("import Runes")			
 	p("\n")
-	
+	pn(`public typealias Field =  String`)
+	pn(``)
+	pn(`public func CombineFields( fields: [Field] ) -> String {`)
+	pn(`    var strings = [String]()`)
+	pn(`    for (index, value) in fields.enumerate() {`)
+	pn(`	strings[index] = "\(value)"`)
+	pn(`    }`)
+	pn(`    return strings.joinWithSeparator(",")`)
+	pn(`}	`)
 	//p("package %s\n", pkg)
 	p("public struct %s {\n", pkg)
 
@@ -1162,20 +1173,25 @@ func (a *API) PopulateSchemas() {
 	}
 	a.schemas = make(map[string]*Schema)
 	for name, mi := range m {
-		s := &Schema{
-			api:     a,
-			apiName: name,
-			m:       mi.(map[string]interface{}),
-		}
-
-		// And a little gross hack, so a map alone is good
-		// enough to get its apiName:
-		s.m["_apiName"] = name
-
-		a.schemas[name] = s
-		err := s.populateSubSchemas()
-		if err != nil {
-			panicf("Error populating schema with API name %q: %v", name, err)
+		for _,reg := range serviceFilter {
+			if matched, _ := regexp.MatchString(reg, name); matched {			
+				s := &Schema{
+					api:     a,
+					apiName: name,
+					m:       mi.(map[string]interface{}),
+				}
+				
+				// And a little gross hack, so a map alone is good
+				// enough to get its apiName:
+				s.m["_apiName"] = name
+				
+				a.schemas[name] = s
+				err := s.populateSubSchemas()
+				if err != nil {
+					panicf("Error populating schema with API name %q: %v", name, err)
+				}
+				break
+			}
 		}
 	}
 }
@@ -1341,7 +1357,8 @@ func (meth *Method) generateCode() {
 	pn("\n// method id %q:", meth.Id())
 	pn("// meth generateCode")
 
-	retTypeComma := responseType(a, meth.m)
+	retType := responseType(a, meth.m)
+	retTypeComma := retType
 	if retTypeComma != "" {
 		retTypeComma += ", "
 	}
@@ -1463,7 +1480,7 @@ func (meth *Method) generateCode() {
 	pn(indent + "return self")
 	pn(swiftIndent + "}")
 
-	pn("\n" + swiftIndent + "func Do(block: (%serror: NSError?) -> () ) {", retTypeComma)
+	pn("\n" + swiftIndent + "func Do(block: (result: Decoded<%s>) -> () ) {", retType)
 
 	// TODO: convert to swift"
 	/*
@@ -1591,15 +1608,15 @@ func (meth *Method) generateCode() {
 	pn(indent + `headers["User-Agent"] = "google-api-swift-client/` + goGenVersion + `"`)
 	//pn(indent + "client.session.configuration.HTTPAdditionalHeaders = headers")
 	pn(indent + "var request = client.request(Alamofire.Method.%s, url, parameters: params)", httpMethod)	
-	pn(indent + "request.responseJSON( completionHandler: { (request, response, json, error) in ")
-	decode := ""
-	if retTypeComma != "" {
-		decode = responseType(a, meth.m) +  ".decode(json), "
-	}
-	pn(indent + swiftIndent + "if let json = json as? JSON {")
-	pn(indent + swiftIndent + swiftIndent + "block(%serror: error)", decode)
+	pn(indent + "request.responseJSON( completionHandler: { (request, response, result) in ")
+	pn(indent + swiftIndent + "if result.isFailure {")
+	pn(indent + swiftIndent + swiftIndent + `log.verbose("\(result.error)") // error handling`)	
+
 	pn(indent + swiftIndent + "} else {")
-	pn(indent + swiftIndent + swiftIndent + "// error handling")
+	pn(indent + swiftIndent + swiftIndent + "if let json = result.value as? JSON {" )
+	pn(indent + swiftIndent + swiftIndent + swiftIndent + "block(%s.decode(json))", retType)
+	pn(indent + swiftIndent + swiftIndent + "}" )	
+	pn(indent + swiftIndent + swiftIndent + `log.verbose("\(result.error)") // error handling`)
 	pn(indent + swiftIndent + "}")	
 	pn(indent + "})")
 	//pn(indent + "if err != nil { return %serr }", nilRet)
@@ -1701,13 +1718,22 @@ func (a *API) APIMethods() []*Method {
 	return meths
 }
 
+
+
 func (a *API) Resources(m map[string]interface{}, p string) []*Resource {
 	res := []*Resource{}
 	resMap := jobj(m, "resources")
 	for _, rname := range sortedKeys(resMap) {
+		log.Printf("resource %s", rname)		
 		rmi := resMap[rname]
 		rm := rmi.(map[string]interface{})
-		res = append(res, &Resource{a, rname, p, rm, a.Resources(rm, fmt.Sprintf("%s.%s", p, rname))})
+		for _,reg := range serviceFilter {
+			if matched, _ := regexp.MatchString(reg, rname); matched {
+				res = append(res, &Resource{a, rname, p, rm, a.Resources(rm, fmt.Sprintf("%s.%s", p, rname))})
+				break
+			}
+				
+		}		
 	}
 	return res
 }
