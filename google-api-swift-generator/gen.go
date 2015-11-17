@@ -426,7 +426,8 @@ func (a *API) GenerateCode() ([]byte, error) {
 	pn("import Foundation")
 	pn("import Alamofire")
 	pn("import Argo")
-	pn("import Runes")			
+	pn("import Curry")	
+	//pn("import Runes")			
 	p("\n")
 	pn(`public typealias Field =  String`)
 	pn(``)
@@ -437,63 +438,32 @@ func (a *API) GenerateCode() ([]byte, error) {
 	pn(`    }`)
 	pn(`    return strings.joinWithSeparator(",")`)
 	pn(`}	`)
+	p("// MARK: scope constants\n")	
+	a.generateScopeConstants("")
+	p("\n")	
 	//p("package %s\n", pkg)
-	p("public struct %s {\n", pkg)
+	serviceName := fmt.Sprintf("_%sService", pkg)
+	p("public class %s {\n", serviceName)
 
-	// p("import (\n")
-	// for _, pkg := range []string{
-	// 	"bytes",
-	// 	*googleAPIPkg,
-	// 	"encoding/json",
-	// 	"errors",
-	// 	"fmt",
-	// 	"io",
-	// 	"net/http",
-	// 	"net/url",
-	// 	"strconv",
-	// 	"strings",
-	// 	*contextPkg,
-	// } {
-	// 	p("\t%q\n", pkg)
-	// }
-	// p(")\n\n")
-	// pn("// Always reference these packages, just in case the auto-generated code")
-	// pn("// below doesn't.")
-	// pn("var _ = bytes.NewBuffer")
-	// pn("var _ = strconv.Itoa")
-	// pn("var _ = fmt.Sprintf")
-	// pn("var _ = json.NewDecoder")
-	// pn("var _ = io.Copy")
-	// pn("var _ = url.Parse")
-	// pn("var _ = googleapi.Version")
-	// pn("var _ = errors.New")
-	// pn("var _ = strings.Replace")
-	// pn("var _ = context.Background")
-	// pn("")
 	pn(swiftIndent + "static let apiId = %q", jstr(m, "id"))
 	pn(swiftIndent + "static let apiName = %q", jstr(m, "name"))
 	pn(swiftIndent + "static let apiVersion = %q", jstr(m, "version"))
 	pn(swiftIndent + "static let basePath = %q", a.apiBaseURL())
 	p("\n")
-	p("// MARK: scope constants\n")	
-	a.generateScopeConstants(swiftIndent)
-	p("\n")
+
 	a.GetName("New") // ignore return value; we're the first caller	
-	pn(swiftIndent + "static func New(client: Alamofire.Manager) -> Service {")
-	pn(indent + "return Service( client: client, BasePath: %s.basePath)", pkg)
-	/* trying out lazy
+	pn(swiftIndent + "static func New(client: Alamofire.Manager) -> %s {", serviceName)
+	pn(indent + "return %s( client: client, BasePath: %s.basePath)", serviceName, serviceName)
+	/* trying out lazy 
 	for _, res := range reslist { // add top level resources.
 		pn(indent + "%s = %s(s)", res.GoField(), res.SwiftType())
 	}
 */
 	//pn(indent + "return s, nil")
 	pn(swiftIndent + "}")		
-	p("}\n")	
 
 	
 	p("//service\n")
-	a.GetName("Service") // ignore return value; no user-defined names yet
-	p("\npublic class Service {\n")
 	pn(swiftIndent + "private init(client: Alamofire.Manager, BasePath: String) {")
 	pn("%sself.client = client", swiftIndent + swiftIndent)
 	pn("%sself.BasePath = BasePath", swiftIndent + swiftIndent)		
@@ -511,6 +481,8 @@ func (a *API) GenerateCode() ([]byte, error) {
 	pn("")
 
 	p("}\n")
+	p("typealias youtube = %s\n", serviceName)		
+	
 
 	p("// MARK: res generatetype\n")
 	for _, res := range reslist {
@@ -548,7 +520,7 @@ func (a *API) generateScopeConstants(indent string) {
 	}
 
 	a.p(indent + "// OAuth2 scopes used by this API.\n")
-	a.p(indent + "struct scope {\n")
+	a.p(indent + "public struct YoutubeScope {\n")
 	n := 0
 	for _, scopeName := range sortedKeys(scopes) {
 		mi := scopes[scopeName]
@@ -1028,7 +1000,7 @@ func (s *Schema) writeSchemaCode(indent string, api *API) {
 
 	if destSchema, ok := s.Type().ReferenceSchema(); ok {
 		// Convert it to a struct using embedding.
-		s.api.p("\nstruct %s: JSONDecodable {\n // REFERENCE", s.SwiftName())
+		s.api.p("\nstruct %s: Decodable {\n // REFERENCE", s.SwiftName())
 		s.api.p("\t%s\n", destSchema.SwiftName())
 		s.api.p("}\n")
 		return
@@ -1091,7 +1063,7 @@ func (s *Schema) writeSchemaStruct(indent string, api *API) {
 		return
 	}
 	// TODO: description
-	s.api.p("\nstruct %s: JSONDecodable {\n", s.GoName())
+	s.api.p("\nstruct %s {\n", s.GoName())
 	for i, p := range s.properties() {
 		if i > 0 {
 			s.api.p("\n")
@@ -1108,52 +1080,70 @@ func (s *Schema) writeSchemaStruct(indent string, api *API) {
 			p.APIName(), extraOpt)
 
 	}
-
+	s.api.p("}")
 	// create function
-	s.api.p("\n" + indent + "static func create(")
-	for i, p := range s.properties() {
-		if i > 0 {
-			s.api.p(")(")
-		}
-		pname := validSwiftIdentifer(p.apiName)
-		ptype := p.Type().AsSwift()
-		s.api.p("%s: %s", pname, ptype)
+	// s.api.p("\n" + indent + "static func create(")
+	// for i, p := range s.properties() {
+	// 	if i > 0 {
+	// 		s.api.p(")(")
+	// 	}
+	// 	pname := validSwiftIdentifer(p.apiName)
+	// 	ptype := p.Type().AsSwift()
+	// 	s.api.p("%s: %s", pname, ptype)
 
-	}
-	s.api.p(") -> %s {\n", s.GoName())
-	s.api.p(indent + swiftIndent + "return %s(", s.GoName())
-	for i, p := range s.properties() {
-		if i > 0 {
-			s.api.p(", ")
-		}
-		pname := validSwiftIdentifer(p.apiName)
-		s.api.p("%s: %s", pname, pname)
+	// }
+	// s.api.p(") -> %s {\n", s.GoName())
+	// s.api.p(indent + swiftIndent + "return %s(", s.GoName())
+	// for i, p := range s.properties() {
+	// 	if i > 0 {
+	// 		s.api.p(", ")
+	// 	}
+	// 	pname := validSwiftIdentifer(p.apiName)
+	// 	s.api.p("%s: %s", pname, pname)
 		
-	}
-	s.api.p(")\n")
-	s.api.pn(indent + "}")
-
-	// decode function
-	s.api.p("\n" + indent + "static func decode (j: JSON) -> Decoded<%s> {\n", s.GoName())
-	s.api.pn(indent + swiftIndent + "return %s.create",  s.GoName())
-	for i, p := range s.properties() {
-		if i > 0 {
-			s.api.p(indent + swiftIndent + swiftIndent + "<*> ")
-		} else {
-			s.api.p(indent + swiftIndent + swiftIndent + "<^> ")
-		}
+	// }
+	// s.api.p(")\n")
+	// s.api.pn(indent + "}")
+	if len(s.properties()) > 0 {
+		s.api.p("\n" + "extension %s: Decodable {", s.GoName())
 		
-		pname := p.apiName
-		// TODO: Can't have all conditional types in structs
-		if _, ok := p.Type().ArrayType(); ok {	
-			s.api.pn(`j <|| "%s"`, pname)
-		} else {
-			s.api.pn(`j <| "%s"`, pname)			
-		}
+		// decode function
+		returnType := fmt.Sprintf("Decoded<%s>", s.GoName())
+		s.api.p("\n" + indent + "static func decode (j: JSON) -> %s {\n", returnType )
+		last := "part0"
+		s.api.pn(indent + swiftIndent + "let %s = curry(%s.init)", last, s.GoName())
+		for i, p := range s.properties() {
+			if i == 0 {
+				s.api.p(indent + swiftIndent + swiftIndent + "<^> ")
+			} else if i%4 == 3 {
+				next := fmt.Sprintf("part%d", i)
+				s.api.pn(indent + swiftIndent  + "let %s = %s", next, last)
+				s.api.p(indent + swiftIndent + swiftIndent + "<*> ")
+				last = next
+			} else {
+				s.api.p(indent + swiftIndent + swiftIndent + "<*> ")
+			}
+			
+			pname := p.apiName
+			
+			// TODO: Can't have all conditional types in structs
+			if _, ok := p.Type().ArrayType(); ok {
+				s.api.p(`j <|| "%s"`, pname)
+			} else {
+				if _, ok := p.Type().Reference(); ok {
+					s.api.p(`j <|? "%s"`, pname)				
+				} else {
+					s.api.p(`j <| "%s"`, pname)
+				}
 
+			}
+			s.api.pn(" // %s", p.Type().apiType())
+
+		}
+		s.api.pn(indent + swiftIndent + "return %s", last)	
+		s.api.pn(indent + "}")
+		s.api.p("}\n")
 	}
-	s.api.pn(indent + "}")
-	s.api.p("}\n")
 }
 
 // PopulateSchemas reads all the API types ("schemas") from the JSON file
@@ -1362,7 +1352,12 @@ func (meth *Method) generateCode() {
 	if retTypeComma != "" {
 		retTypeComma += ", "
 	}
-
+	decodedRetType := retType
+	if decodedRetType != "" {
+		decodedRetType = "Decoded<"+retType+">"
+	} else {
+		decodedRetType = "JSON"
+	}
 	args := meth.NewArguments()
 	methodName := meth.name
 	prefix := ""
@@ -1480,7 +1475,7 @@ func (meth *Method) generateCode() {
 	pn(indent + "return self")
 	pn(swiftIndent + "}")
 
-	pn("\n" + swiftIndent + "func Do(block: (result: Decoded<%s>) -> () ) {", retType)
+	pn("\n" + swiftIndent + "func Do(block: (result: %s) -> () ) {", decodedRetType)
 
 	// TODO: convert to swift"
 	/*
@@ -1614,7 +1609,11 @@ func (meth *Method) generateCode() {
 
 	pn(indent + swiftIndent + "} else {")
 	pn(indent + swiftIndent + swiftIndent + "if let json = result.value as? JSON {" )
-	pn(indent + swiftIndent + swiftIndent + swiftIndent + "block(%s.decode(json))", retType)
+	if retType != "" {
+		pn(indent + swiftIndent + swiftIndent + swiftIndent + "block( result: %s.decode(json))", retType)
+	} else {
+		pn(indent + swiftIndent + swiftIndent + swiftIndent + "block( result: json)")		
+	}
 	pn(indent + swiftIndent + swiftIndent + "}" )	
 	pn(indent + swiftIndent + swiftIndent + `log.verbose("\(result.error)") // error handling`)
 	pn(indent + swiftIndent + "}")	
